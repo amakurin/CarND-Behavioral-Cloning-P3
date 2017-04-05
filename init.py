@@ -80,22 +80,32 @@ from keras.layers import Flatten, Dense, Lambda, Conv2D, MaxPooling2D, Dropout, 
 def create_model(input_shape= (160,320,3)):
 	model = Sequential()
 	model.add(Lambda(lambda x: x / 127.5 - 1., input_shape=input_shape))
-	#model.add(Conv2D(3,1))
-	#model.add(Conv2D(16,5))
-	#model.add(Activation('relu'))
-	#model.add(MaxPooling2D())
-	#model.add(Conv2D(32,5))
-	#model.add(Activation('relu'))
-	#model.add(MaxPooling2D())
+	model.add(Conv2D(3,1))
+	
+	model.add(Conv2D(24,5, strides=(1, 2)))
+	model.add(Activation('relu'))
+	model.add(MaxPooling2D())
+	model.add(Dropout(0.5))
+	
+	model.add(Conv2D(36,5, strides=(1, 2)))
+	model.add(Activation('relu'))
+	model.add(MaxPooling2D())
+	model.add(Dropout(0.5))
+	
+	model.add(Conv2D(48,3))
+	model.add(Activation('relu'))
+	model.add(MaxPooling2D())
+	model.add(Dropout(0.5))
+	
 	model.add(Flatten())
-	#model.add(Dense(512))
-	#model.add(Dropout(0.5))
-	#model.add(Activation('relu'))
-	#model.add(Dense(128))
-	#model.add(Dropout(0.5))
-	#model.add(Activation('relu'))
-	#model.add(Dense(64))
-	#model.add(Activation('relu'))
+	model.add(Dense(512))
+	model.add(Dropout(0.5))
+	model.add(Activation('relu'))
+	model.add(Dense(128))
+	model.add(Dropout(0.5))
+	model.add(Activation('relu'))
+	model.add(Dense(16))
+	model.add(Activation('relu'))
 	model.add(Dense(1))
 	
 	model.compile(loss='mse', optimizer='adam')
@@ -121,7 +131,7 @@ valid_generator = generator(valid_log,
 
 model = create_model(input_shape= new_shape)
 model.fit_generator(train_generator, 
-					steps_per_epoch = 100, 
+					steps_per_epoch = 500, 
 					validation_data=valid_generator, 
 					validation_steps=20, epochs=5)
 
