@@ -84,7 +84,7 @@ def create_model(input_shape= (160,320,3)):
 	
 	model.add(Conv2D(24,5, strides=(2, 2)))
 	model.add(Activation('relu'))
-	model.add(MaxPooling2D())
+	#model.add(MaxPooling2D())
 	model.add(Dropout(0.5))
 	
 	model.add(Conv2D(36,5, strides=(2, 2)))
