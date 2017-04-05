@@ -115,18 +115,18 @@ log = readlog()
 from sklearn.model_selection import train_test_split
 train_log, valid_log = train_test_split(log, test_size=0.2)
 
-new_shape = (32,128,3)
+new_shape = (65,320,3)#(32,128,3)
 crop_param = ((70, 25), (0, 0))
 resize_param = new_shape[:2]
 train_generator = generator(train_log, 
-							keep_direct_threshold = 0.2, 
+							keep_direct_threshold = 0.5, 
 							flip_random = True,
-							resize_param=resize_param, 
+							#resize_param=resize_param, 
 							crop_param=crop_param,
 							add_distortion=True,
 							randomize_light=True)
 valid_generator = generator(valid_log, 
-							resize_param=resize_param, 
+							#resize_param=resize_param, 
 							crop_param=crop_param)
 
 model = create_model(input_shape= new_shape)
