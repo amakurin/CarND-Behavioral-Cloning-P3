@@ -1,6 +1,5 @@
 import csv
 import cv2
-import os
 import random
 import numpy as np
 import sklearn
@@ -12,7 +11,7 @@ def readlog(log_path = './data/driving_log.csv', img_path = './data/IMG/'):
 		reader = csv.reader(csvlog)
 		for line in reader:
 			for i in range(0,3):
-				line[i] = img_path + os.path.basename(line[i])
+				line[i] = img_path + line[i].split('\\')[-1]
 			for i in range(3,7):
 				line[i] = float(line[i])
 			lines.append(line)
