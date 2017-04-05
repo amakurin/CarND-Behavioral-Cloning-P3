@@ -99,9 +99,11 @@ new_shape = (32,128,3)
 crop_param = ((70, 25), (0, 0))
 resize_param = new_shape[:2]
 train_generator = generator(train_log, 
-							use_side_angle = 0.2, flip_random = True,
+							use_side_angle = 0.2, 
+							flip_random = True,
 							resize_param=resize_param, 
-							crop_param=crop_param
+							crop_param=crop_param,
+							add_distortion=True
 							)
 valid_generator = generator(valid_log, 
 							resize_param=resize_param, 
