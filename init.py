@@ -25,7 +25,7 @@ def get_sample(log_line, keep_direct_threshold = 0.1,
 	if angle < direct_threshold:
 		if np.random.uniform() > keep_direct_threshold:
 			# steering additions center, left, right
-			diffs = [0, -1.0 * side_angle, side_angle]
+			diffs = [0, side_angle, -1.0 *side_angle]
 			index = np.random.randint(1,3)
 			add = diffs[index] 
 	img_path = log_line[index]
@@ -121,7 +121,7 @@ valid_generator = generator(valid_log,
 
 model = create_model(input_shape= new_shape)
 model.fit_generator(train_generator, 
-					steps_per_epoch = 500, 
+					steps_per_epoch = 100, 
 					validation_data=valid_generator, 
 					validation_steps=20, epochs=5)
 
