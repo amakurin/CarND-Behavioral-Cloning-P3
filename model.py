@@ -110,3 +110,35 @@ def train_model(model_file_name='model.h5',
 
 	model.save(model_file_name)
 
+def fine_tune_model(src_file_name='model.h5',
+					tgt_file_name='model_tuned.h5',
+					log_path = './data/driving_log.csv', 
+					img_path = './data/IMG/'):
+	log = lu.readlog(log_path=log_path, img_path=img_path)
+	train_log, valid_log = train_valid_split(log)
+
+	new_shape = (65,320,3)#(32,128,3)
+	crop_param = ((70, 25), (0, 0))
+	resize_param = new_shape[:2]
+	
+	train_generator = generator(train_log, 
+								keep_direct_threshold = 0.5, 
+								flip_random = True,
+								#resize_param=resize_param, 
+								crop_param=crop_param,
+								add_distortion=True,
+								randomize_light=True)
+	valid_generator = generator(valid_log, 
+								#resize_param=resize_param, 
+								crop_param=crop_param)
+	model = create_model(input_shape= new_shape)
+	model.load_weights(src_file_name)
+	model = compile_model(model)
+	
+	model.fit_generator(train_generator, 
+						steps_per_epoch = 500, 
+						validation_data=valid_generator, 
+						validation_steps=20, epochs=5)
+
+	model.save(tgt_file_name)
+
