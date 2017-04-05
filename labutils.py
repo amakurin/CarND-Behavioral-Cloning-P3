@@ -36,3 +36,14 @@ def distort(img, maxAngle = np.pi/18, maxCenterDistance = 6, maxScale = 1.2):
 	rot_mat = cv2.getRotationMatrix2D(tuple(dcenter), dangle, dscale)
 	result = cv2.warpAffine(img, rot_mat, cvshape, flags=cv2.INTER_LINEAR)
 	return result	
+
+def randomize_light(img, const_factor = 0.5):
+	'''
+	Applies random light adjustment 
+	'''
+	lab = cv2.cvtColor(img, cv2.COLOR_RGB2Lab)
+	L,a,b = cv2.split(lab)
+	L = L * (const_factor + np.random.uniform())
+	L[L>255] = 255
+	lab = cv2.merge([np.array(L, dtype = np.uint8),a,b])
+	return cv2.cvtColor(lab, cv2.COLOR_Lab2RGB)

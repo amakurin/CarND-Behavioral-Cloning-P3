@@ -17,17 +17,21 @@ def readlog(log_path = './data/driving_log.csv', img_path = './data/IMG/'):
 			lines.append(line)
 	return lines;
 
-def get_sample(log_line, use_side_angle = 0.2):
+def get_sample(log_line, keep_direct_threshold = 0.1, 
+			direct_threshold = 0.1, side_angle = 0.2):
 	index = 0
 	add = 0
-	if use_side_angle is not None:
-		# steering additions center, left, right
-		diffs = [0, -1.0 * use_side_angle, use_side_angle]
-		index = np.random.randint(0,3)
-		add = diffs[index] 
+	angle = log_line[3] 
+	if angle < direct_threshold:
+		if np.random.uniform() > keep_direct_threshold:
+			# steering additions center, left, right
+			diffs = [0, -1.0 * side_angle, side_angle]
+			index = np.random.randint(1,3)
+			add = diffs[index] 
 	img_path = log_line[index]
 	img = cv2.imread(img_path)
-	angle = log_line[3] + add 
+	img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+	angle = angle + add 
 	return (img, angle)
 
 def random_flip(img, angle):
@@ -37,8 +41,10 @@ def random_flip(img, angle):
 	return img, angle
 
 def generator(samples, batch_size=128, 
-			use_side_angle = None, flip_random = False, 
+			keep_direct_threshold = 1., direct_threshold = 0.1, side_angle = 0.2, 
+			flip_random = False, 
 			add_distortion = False,
+			randomize_light = False,
 			resize_param = None, crop_param = None):
 	num_samples = len(samples)
 	while 1:
@@ -48,13 +54,18 @@ def generator(samples, batch_size=128,
 			images = []
 			angles = []
 			for batch_sample in batch_samples:
-				img, angle = get_sample(batch_sample, use_side_angle=use_side_angle)
+				img, angle = get_sample(batch_sample, 
+										keep_direct_threshold=keep_direct_threshold,
+										direct_threshold=direct_threshold,
+										side_angle=side_angle)
 				if flip_random:
 					img, angle = random_flip(img, angle)
 				if crop_param is not None:
 					img = lu.crop(img, crop_param)	
 				if add_distortion:
 					img = lu.distort(img)
+				if randomize_light:
+					img = lu.randomize_light(img)
 				if resize_param is not None:
 					img = lu.resize(img, resize_param)
 				images.append(img)
@@ -70,21 +81,21 @@ def create_model(input_shape= (160,320,3)):
 	model = Sequential()
 	model.add(Lambda(lambda x: x / 127.5 - 1., input_shape=input_shape))
 	#model.add(Conv2D(3,1))
-	model.add(Conv2D(16,5))
-	model.add(Activation('relu'))
-	model.add(MaxPooling2D())
-	model.add(Conv2D(32,5))
-	model.add(Activation('relu'))
-	model.add(MaxPooling2D())
+	#model.add(Conv2D(16,5))
+	#model.add(Activation('relu'))
+	#model.add(MaxPooling2D())
+	#model.add(Conv2D(32,5))
+	#model.add(Activation('relu'))
+	#model.add(MaxPooling2D())
 	model.add(Flatten())
-	model.add(Dense(512))
-	model.add(Dropout(0.5))
-	model.add(Activation('relu'))
-	model.add(Dense(128))
-	model.add(Dropout(0.5))
-	model.add(Activation('relu'))
-	model.add(Dense(64))
-	model.add(Activation('relu'))
+	#model.add(Dense(512))
+	#model.add(Dropout(0.5))
+	#model.add(Activation('relu'))
+	#model.add(Dense(128))
+	#model.add(Dropout(0.5))
+	#model.add(Activation('relu'))
+	#model.add(Dense(64))
+	#model.add(Activation('relu'))
 	model.add(Dense(1))
 	
 	model.compile(loss='mse', optimizer='adam')
@@ -98,16 +109,15 @@ new_shape = (32,128,3)
 crop_param = ((70, 25), (0, 0))
 resize_param = new_shape[:2]
 train_generator = generator(train_log, 
-							use_side_angle = 0.2, 
+							keep_direct_threshold = 0.2, 
 							flip_random = True,
 							resize_param=resize_param, 
 							crop_param=crop_param,
-							add_distortion=True
-							)
+							add_distortion=True,
+							randomize_light=True)
 valid_generator = generator(valid_log, 
 							resize_param=resize_param, 
-							crop_param=crop_param
-							)
+							crop_param=crop_param)
 
 model = create_model(input_shape= new_shape)
 model.fit_generator(train_generator, 
@@ -127,6 +137,11 @@ model.save('model.h5')
 #
 #img = lu.distort(img)
 #cv2.imshow('distort {}'.format(angle),img)
+#cv2.waitKey(0)
+#cv2.destroyAllWindows()
+#
+#img = lu.randomize_light(img)
+#cv2.imshow('light {}'.format(angle),img)
 #cv2.waitKey(0)
 #cv2.destroyAllWindows()
 #
