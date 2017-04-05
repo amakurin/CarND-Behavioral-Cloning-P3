@@ -1,0 +1,127 @@
+import csv
+import cv2
+import os
+import random
+import numpy as np
+import sklearn
+import labutils as lu
+
+def readlog(log_path = './data/driving_log.csv', img_path = './data/IMG/'):
+	lines = []
+	with open(log_path) as csvlog:
+		reader = csv.reader(csvlog)
+		for line in reader:
+			for i in range(0,3):
+				line[i] = img_path + os.path.basename(line[i])
+			for i in range(3,7):
+				line[i] = float(line[i])
+			lines.append(line)
+	return lines;
+
+def random_flip(img, angle):
+	if np.random.randint(0,2)==0:
+		img = cv2.flip(img, 1)
+		angle = -1.0 * angle
+	return img, angle
+	
+def get_sample(log_line, use_side_angle = 0.2):
+	index = 0
+	add = 0
+	if use_side_angle is not None:
+		# steering additions center, left, right
+		diffs = [0, -1.0 * use_side_angle, use_side_angle]
+		index = np.random.randint(0,3)
+		add = diffs[index] 
+	img_path = log_line[index]
+	img = cv2.imread(img_path)
+	angle = log_line[3] + add 
+	return (img, angle)
+	
+def generator(samples, batch_size=128, 
+			use_side_angle = None, flip_random = False,
+			resize_param = None, crop_param = None):
+	num_samples = len(samples)
+	while 1:
+		random.shuffle(samples)
+		for offset in range(0, num_samples, batch_size):
+			batch_samples = samples[offset:offset+batch_size]
+			images = []
+			angles = []
+			for batch_sample in batch_samples:
+				img, angle = get_sample(batch_sample, use_side_angle=use_side_angle)
+				if flip_random:
+					img, angle = random_flip(img, angle)
+				if crop_param is not None:
+					img = lu.crop(img, crop_param)	
+				if resize_param is not None:
+					img = lu.resize(img, resize_param)
+				images.append(img)
+				angles.append(angle)
+			X_train = np.array(images)
+			y_train = np.array(angles)
+			yield sklearn.utils.shuffle(X_train, y_train)
+
+from keras.models import Sequential
+from keras.layers import Flatten, Dense, Lambda, Conv2D, MaxPooling2D, Dropout, Activation
+
+def create_model(input_shape= (160,320,3)):
+	model = Sequential()
+	model.add(Lambda(lambda x: x / 127.5 - 1., input_shape=input_shape))
+	#model.add(Conv2D(3,1))
+	model.add(Conv2D(16,5))
+	model.add(Activation('relu'))
+	model.add(MaxPooling2D())
+	model.add(Conv2D(32,5))
+	model.add(Activation('relu'))
+	model.add(MaxPooling2D())
+	model.add(Flatten())
+	model.add(Dense(512))
+	model.add(Dropout(0.5))
+	model.add(Activation('relu'))
+	model.add(Dense(128))
+	model.add(Dropout(0.5))
+	model.add(Activation('relu'))
+	model.add(Dense(64))
+	model.add(Activation('relu'))
+	model.add(Dense(1))
+	
+	model.compile(loss='mse', optimizer='adam')
+	return model
+
+log = readlog()
+from sklearn.model_selection import train_test_split
+train_log, valid_log = train_test_split(log, test_size=0.2)
+
+new_shape = (128,32,3)
+crop_param = ((70, 25), (0, 0))
+resize_param = (new_shape[1], new_shape[0])
+train_generator = generator(train_log, 
+							use_side_angle = 0.2, flip_random = True,
+							resize_param=resize_param, 
+							crop_param=crop_param)
+valid_generator = generator(valid_log, resize_param=resize_param, crop_param=crop_param)
+
+model = create_model(input_shape= new_shape)
+model.fit_generator(train_generator, 
+					steps_per_epoch = 500, 
+					validation_data=valid_generator, 
+					validation_steps=20, epochs=5)
+
+model.save('model.h5')
+
+
+#img, angle = get_sample(log[0])
+#img, angle = random_flip(img, angle)
+#
+#cv2.imshow('angle {}'.format(angle),img)
+#cv2.waitKey(0)
+#cv2.destroyAllWindows()
+#img = crop(img, ((70, 25), (0, 0)))
+#cv2.imshow('angle {}'.format(angle),img)
+#cv2.waitKey(0)
+#cv2.destroyAllWindows()
+#
+#img = resize(img, (32,32))
+#cv2.imshow('angle {}'.format(angle),img)
+#cv2.waitKey(0)
+#cv2.destroyAllWindows()

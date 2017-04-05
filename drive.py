@@ -3,6 +3,7 @@ import base64
 from datetime import datetime
 import os
 import shutil
+import cv2
 
 import numpy as np
 import socketio
@@ -12,6 +13,8 @@ from PIL import Image
 from flask import Flask
 from io import BytesIO
 
+import labutils as lu
+
 from keras.models import load_model
 import h5py
 from keras import __version__ as keras_version
@@ -20,8 +23,7 @@ sio = socketio.Server()
 app = Flask(__name__)
 model = None
 prev_image_array = None
-
-
+	
 class SimplePIController:
     def __init__(self, Kp, Ki):
         self.Kp = Kp
@@ -61,6 +63,8 @@ def telemetry(sid, data):
         imgString = data["image"]
         image = Image.open(BytesIO(base64.b64decode(imgString)))
         image_array = np.asarray(image)
+        image_array = lu.crop (image_array, ((70, 25), (0, 0)))
+        image_array = lu.resize(image_array, (32,128))
         steering_angle = float(model.predict(image_array[None, :, :, :], batch_size=1))
 
         throttle = controller.update(float(speed))
