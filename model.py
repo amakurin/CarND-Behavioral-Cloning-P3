@@ -117,6 +117,7 @@ def model_nvid(input_shape):
 	return model
 
 def create_model(version='default', input_shape= (160,320,3)):
+	print ('Model used: {}'.format(version))
 	model_ctors = { 'nvidia': model_nvid, 
 					'v2': model_v2,
 					'default': model_v2}
