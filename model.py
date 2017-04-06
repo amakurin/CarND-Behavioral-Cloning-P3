@@ -44,7 +44,7 @@ def generator(samples, batch_size=128,
 from keras.models import Sequential
 from keras.layers import Flatten, Dense, Lambda, Conv2D, MaxPooling2D, Dropout, Activation
 
-def create_model(input_shape= (160,320,3)):
+def create_model_nvidia(input_shape= (160,320,3)):
 	model = Sequential()
 	model.add(Lambda(lambda x: x / 127.5 - 1., input_shape=input_shape))
 	#model.add(Conv2D(3,1))
@@ -88,6 +88,63 @@ def create_model(input_shape= (160,320,3)):
 	
 	return model
 
+def create_model(input_shape= (160,320,3)):
+	model = Sequential()
+	model.add(Lambda(lambda x: x / 127.5 - 1., input_shape=input_shape))
+
+	#out: 65-1+1/1=65 320-1+1/1=320
+	model.add(Conv2D(3,1))
+	model.add(Activation('elu'))
+	
+	#out: 65-3+1/1=63 320-3+1/1=318
+	model.add(Conv2D(32,3))
+	model.add(Activation('elu'))
+
+	#out: 63-3+1/1=61 318-3+1/1=316
+	model.add(Conv2D(32,3))
+	model.add(Activation('elu'))
+	
+	#out: 61-2/1+1=60 318-2/1+1=317
+	model.add(MaxPooling2D())
+	model.add(Dropout(0.5))
+
+	#out: 60-3+1/1=58 317-3+1/1=315
+	model.add(Conv2D(64,3))
+	model.add(Activation('elu'))
+
+	#out: 58-3+1/1=56 315-3+1/1=313
+	model.add(Conv2D(64,3))
+	model.add(Activation('elu'))
+	
+	#out: 56-2/1+1=55 313-2/1+1=312
+	model.add(MaxPooling2D())
+	model.add(Dropout(0.5))
+	
+	#out: 55-3+1/1=53 312-3+1/1=310
+	model.add(Conv2D(64,3))
+	model.add(Activation('elu'))
+
+	#out: 53-3+1/1=51 310-3+1/1=308
+	model.add(Conv2D(64,3))
+	model.add(Activation('elu'))
+	
+	#out: 51-2/1+1=50 308-2/1+1=307
+	model.add(MaxPooling2D())
+	model.add(Dropout(0.5))
+	
+	model.add(Flatten())
+	model.add(Dense(512))
+	model.add(Activation('elu'))
+	model.add(Dense(64))
+	model.add(Dropout(0.5))
+	model.add(Activation('elu'))
+	model.add(Dense(16))
+	model.add(Dropout(0.5))
+	model.add(Activation('elu'))
+	model.add(Dense(1))
+	
+	return model
+
 def compile_model(model):
 	model.compile(loss='mse', optimizer='adam')
 	return model
@@ -104,7 +161,7 @@ def train_model(model_file_name='model.h5',
 	resize_param = new_shape[:2]
 	train_generator = generator(train_log, 
 								keep_direct_threshold = 0.5, 
-								direct_threshold = 0.05,
+								direct_threshold = 0.1,
 								flip_random = True,
 								resize_param=resize_param, 
 								crop_param=crop_param,
@@ -137,7 +194,7 @@ def fine_tune_model(src_file_name='model.h5',
 	
 	train_generator = generator(train_log, 
 								keep_direct_threshold = 0.5, 
-								direct_threshold = 0.05,
+								direct_threshold = 0.1,
 								flip_random = True,
 								resize_param=resize_param, 
 								crop_param=crop_param,
