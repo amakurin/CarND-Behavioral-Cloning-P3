@@ -7,11 +7,11 @@ def tocv(npshape):
 	height, width = npshape
 	return (width, height)
 
-def random_flip(img, angle):
-	if np.random.randint(0,2)==0:
+def random_flip(img, angle, flip_prob = 0.7):
+	if np.random.uniform() < flip_prob:
 		img = cv2.flip(img, 1)
 		angle = -1.0 * angle
-	return img, angle
+	return (img, angle)
 
 def crop(img, topbottom_leftright):
 	top = topbottom_leftright[0][0]
@@ -84,13 +84,17 @@ def get_sample(log_line, keep_direct_threshold = 0.1,
 	angle = angle + add 
 	return (img, angle)
 
-#log = readlog(log_path = './data2/driving_log.csv',	img_path = './data2/IMG/')	
-#img, angle = get_sample(log[np.random.randint(0,len(log))])
-#img, angle = random_flip(img, angle)
-#
-#cv2.imshow('angle {}'.format(angle),img)
-#cv2.waitKey(0)
-#cv2.destroyAllWindows()
+log = readlog(log_path = './data2/driving_log.csv',	img_path = './data2/IMG/')	
+img, angle = get_sample(log[np.random.randint(0,len(log))])
+cv2.imshow('angle {}'.format(angle),img)
+cv2.waitKey(0)
+cv2.destroyAllWindows()
+
+img, angle = random_flip(img, angle)
+
+cv2.imshow('angle {}'.format(angle),img)
+cv2.waitKey(0)
+cv2.destroyAllWindows()
 #
 #img = crop(img, ((70, 25), (0, 0)))
 ##cv2.imshow('crop {}'.format(angle),img)
