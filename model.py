@@ -97,11 +97,11 @@ def create_model(input_shape= (160,320,3)):
 	model.add(Activation('elu'))
 	
 	#out: 65-3+1/1=63 320-3+1/1=318
-	model.add(Conv2D(32,3))
+	model.add(Conv2D(16,3))
 	model.add(Activation('elu'))
 
 	#out: 63-3+1/1=61 318-3+1/1=316
-	model.add(Conv2D(32,3))
+	model.add(Conv2D(16,3))
 	model.add(Activation('elu'))
 	
 	#out: 61-2/1+1=60 318-2/1+1=317
@@ -109,11 +109,11 @@ def create_model(input_shape= (160,320,3)):
 	model.add(Dropout(0.5))
 
 	#out: 60-3+1/1=58 317-3+1/1=315
-	model.add(Conv2D(64,3))
+	model.add(Conv2D(32,3))
 	model.add(Activation('elu'))
 
 	#out: 58-3+1/1=56 315-3+1/1=313
-	model.add(Conv2D(64,3))
+	model.add(Conv2D(32,3))
 	model.add(Activation('elu'))
 	
 	#out: 56-2/1+1=55 313-2/1+1=312
