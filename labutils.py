@@ -24,7 +24,7 @@ def resize(img, new_shape):
 	cvshape = tocv(new_shape[:2])
 	return cv2.resize(img, cvshape, interpolation=cv2.INTER_AREA)
 	
-def distort(img, maxAngle = np.pi/18, maxCenterDistance = 6, maxScale = 1.2):
+def distort(img, angle, max_rot_degrees = 1, max_dx = 20, max_dy = 20, ang_correction = 0.01):
 	'''
 	Adds distortion to input img
 	img - numpy array (height, weight, chans)
@@ -34,15 +34,15 @@ def distort(img, maxAngle = np.pi/18, maxCenterDistance = 6, maxScale = 1.2):
 	'''
 	img_shape = img.shape[:2]
 	cvshape = tocv(img_shape)
-	dangle = np.random.uniform(-maxAngle, maxAngle, 1)[0]
-	distance = math.sqrt(maxCenterDistance)
-	dx = math.floor(np.random.uniform(-distance, distance, 1)[0])
-	dy = math.floor(np.random.uniform(-distance, distance, 1)[0])
-	dscale = np.random.uniform(2-maxScale, maxScale, 1)[0]
-	dcenter = np.array(cvshape)/2 +[dx,dy]
-	rot_mat = cv2.getRotationMatrix2D(tuple(dcenter), dangle, dscale)
+	dangle = np.random.uniform(-max_rot_degrees, max_rot_degrees, 1)[0]
+	dx = np.random.uniform(-max_dx, max_dx, 1)[0]
+	dy = np.random.uniform(-max_dy, max_dy, 1)[0]
+	rot_center = tuple(np.array(cvshape)/2)
+	rot_mat = cv2.getRotationMatrix2D(rot_center, dangle, 1)
+	rot_mat[0][2] += dx
+	rot_mat[1][2] += dy
 	result = cv2.warpAffine(img, rot_mat, cvshape, flags=cv2.INTER_LINEAR)
-	return result	
+	return (result, angle + dx*ang_correction)	
 
 def randomize_light(img, const_factor = 0.5):
 	'''
@@ -85,28 +85,29 @@ def get_sample(log_line, keep_direct_threshold = 0.1,
 	return (img, angle)
 
 #log = readlog(log_path = './data2/driving_log.csv',	img_path = './data2/IMG/')	
-#img, angle = get_sample(log[800])
+#img, angle = get_sample(log[np.random.randint(0,len(log))])
 #img, angle = random_flip(img, angle)
 #
 #cv2.imshow('angle {}'.format(angle),img)
 #cv2.waitKey(0)
 #cv2.destroyAllWindows()
 #
-#img = distort(img)
-#cv2.imshow('distort {}'.format(angle),img)
-#cv2.waitKey(0)
-#cv2.destroyAllWindows()
+#img = crop(img, ((70, 25), (0, 0)))
+##cv2.imshow('crop {}'.format(angle),img)
+##cv2.waitKey(0)
+##cv2.destroyAllWindows()
 #
+#img, angle = distort(img, angle)
+##cv2.imshow('distort {}'.format(angle),img)
+##cv2.waitKey(0)
+##cv2.destroyAllWindows()
+##
 #img = randomize_light(img)
 #cv2.imshow('light {}'.format(angle),img)
 #cv2.waitKey(0)
 #cv2.destroyAllWindows()
-#
-#img = crop(img, ((70, 25), (0, 0)))
-#cv2.imshow('crop {}'.format(angle),img)
-#cv2.waitKey(0)
-#cv2.destroyAllWindows()
-#
+
+
 #img = resize(img, (32,128))
 #cv2.imshow('resize {}'.format(angle),img)
 #cv2.waitKey(0)

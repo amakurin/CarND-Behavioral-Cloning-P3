@@ -30,7 +30,7 @@ def generator(samples, batch_size=128,
 				if crop_param is not None:
 					img = lu.crop(img, crop_param)	
 				if add_distortion:
-					img = lu.distort(img)
+					img, angle = lu.distort(img, angle)
 				if randomize_light:
 					img = lu.randomize_light(img)
 				if resize_param is not None:
