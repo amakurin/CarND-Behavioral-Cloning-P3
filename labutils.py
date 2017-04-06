@@ -84,8 +84,8 @@ def get_sample(log_line, keep_direct_threshold = 0.1,
 	angle = angle + add 
 	return (img, angle)
 
-#log = readlog()	
-#img, angle = get_sample(log[0])
+#log = readlog(log_path = './data2/driving_log.csv',	img_path = './data2/IMG/')	
+#img, angle = get_sample(log[800])
 #img, angle = random_flip(img, angle)
 #
 #cv2.imshow('angle {}'.format(angle),img)

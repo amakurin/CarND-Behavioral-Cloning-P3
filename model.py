@@ -47,31 +47,42 @@ from keras.layers import Flatten, Dense, Lambda, Conv2D, MaxPooling2D, Dropout, 
 def create_model(input_shape= (160,320,3)):
 	model = Sequential()
 	model.add(Lambda(lambda x: x / 127.5 - 1., input_shape=input_shape))
-	model.add(Conv2D(3,1))
+	#model.add(Conv2D(3,1))
 	
+	#out: 66-5+1/2=31 200-5+1/2=98
 	model.add(Conv2D(24,5, strides=(2, 2)))
 	model.add(Activation('relu'))
-	#model.add(MaxPooling2D())
 	model.add(Dropout(0.5))
 	
+	#out: 31-5+1/2=14 98-5+1/2=47
 	model.add(Conv2D(36,5, strides=(2, 2)))
 	model.add(Activation('relu'))
-	model.add(MaxPooling2D())
 	model.add(Dropout(0.5))
 	
+	#out: 14-5+1/2=5 47-5+1/2=22
+	model.add(Conv2D(36,5, strides=(2, 2)))
+	model.add(Activation('relu'))
+	model.add(Dropout(0.5))
+	
+	#out: 5-3+1/1=3 22-3+1/1=20
 	model.add(Conv2D(48,3))
 	model.add(Activation('relu'))
-	model.add(MaxPooling2D())
+	model.add(Dropout(0.5))
+	
+	#out: 3-3+1/1=1 20-3+1/1=18
+	model.add(Conv2D(64,3))
+	model.add(Activation('relu'))
 	model.add(Dropout(0.5))
 	
 	model.add(Flatten())
-	model.add(Dense(512))
+	model.add(Dense(100))
 	model.add(Dropout(0.5))
 	model.add(Activation('relu'))
-	model.add(Dense(128))
+	model.add(Dense(50))
 	model.add(Dropout(0.5))
 	model.add(Activation('relu'))
-	model.add(Dense(16))
+	model.add(Dense(10))
+	model.add(Dropout(0.5))
 	model.add(Activation('relu'))
 	model.add(Dense(1))
 	
@@ -83,62 +94,64 @@ def compile_model(model):
 
 def train_model(model_file_name='model.h5',
 				log_path = './data/driving_log.csv', 
-				img_path = './data/IMG/'):
+				img_path = './data/IMG/',
+				epochs = 5):
 	log = lu.readlog(log_path=log_path, img_path=img_path)
 	train_log, valid_log = train_valid_split(log)
 
-	new_shape = (65,320,3)#(32,128,3)
+	new_shape = (66,200,3)#(65,320,3)
 	crop_param = ((70, 25), (0, 0))
 	resize_param = new_shape[:2]
 	train_generator = generator(train_log, 
 								keep_direct_threshold = 0.5, 
 								flip_random = True,
-								#resize_param=resize_param, 
+								resize_param=resize_param, 
 								crop_param=crop_param,
 								add_distortion=True,
 								randomize_light=True)
 	valid_generator = generator(valid_log, 
-								#resize_param=resize_param, 
+								resize_param=resize_param, 
 								crop_param=crop_param)
 
 	model = create_model(input_shape= new_shape)
 	model = compile_model(model)
 	model.fit_generator(train_generator, 
-						steps_per_epoch = 500, 
+						steps_per_epoch = 300, 
 						validation_data=valid_generator, 
-						validation_steps=20, epochs=5)
+						validation_steps=60, epochs=epochs)
 
 	model.save(model_file_name)
 
 def fine_tune_model(src_file_name='model.h5',
 					tgt_file_name='model_tuned.h5',
 					log_path = './data/driving_log.csv', 
-					img_path = './data/IMG/'):
+					img_path = './data/IMG/',
+					epochs = 5):
 	log = lu.readlog(log_path=log_path, img_path=img_path)
 	train_log, valid_log = train_valid_split(log)
 
-	new_shape = (65,320,3)#(32,128,3)
+	new_shape = (66,200,3)#(65,320,3)
 	crop_param = ((70, 25), (0, 0))
 	resize_param = new_shape[:2]
 	
 	train_generator = generator(train_log, 
 								keep_direct_threshold = 0.5, 
 								flip_random = True,
-								#resize_param=resize_param, 
+								resize_param=resize_param, 
 								crop_param=crop_param,
 								add_distortion=True,
 								randomize_light=True)
 	valid_generator = generator(valid_log, 
-								#resize_param=resize_param, 
+								resize_param=resize_param, 
 								crop_param=crop_param)
 	model = create_model(input_shape= new_shape)
 	model.load_weights(src_file_name)
 	model = compile_model(model)
 	
 	model.fit_generator(train_generator, 
-						steps_per_epoch = 500, 
+						steps_per_epoch = 300, 
 						validation_data=valid_generator, 
-						validation_steps=20, epochs=5)
+						validation_steps=60, epochs=epochs)
 
 	model.save(tgt_file_name)
 
