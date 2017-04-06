@@ -8,7 +8,7 @@ def train_valid_split(samples):
 	return train_test_split(samples, test_size=0.2)
 
 def generator(samples, batch_size=128, 
-			keep_direct_threshold = 1., direct_threshold = 0.1, side_angle = 0.2, 
+			keep_direct_threshold = 1., direct_threshold = 0.1, side_angle = 0.3, 
 			flip_random = False, 
 			add_distortion = False,
 			randomize_light = False,
@@ -139,8 +139,8 @@ def train_model(model_file_name='model.h5',
 	crop_param = ((70, 25), (0, 0))
 	resize_param = new_shape[:2]
 	train_generator = generator(train_log, 
-								keep_direct_threshold = 0.5, 
-								direct_threshold = 0.1,
+								keep_direct_threshold = 0.4, 
+								direct_threshold = 0.05,
 								flip_random = True,
 								resize_param=resize_param, 
 								crop_param=crop_param,
