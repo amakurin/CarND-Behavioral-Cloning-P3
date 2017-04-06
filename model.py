@@ -99,7 +99,7 @@ def train_model(model_file_name='model.h5',
 	log = lu.readlog(log_path=log_path, img_path=img_path)
 	train_log, valid_log = train_valid_split(log)
 
-	new_shape = (66,200,3)#(65,320,3)
+	new_shape = (65,320,3)#(66,200,3)
 	crop_param = ((70, 25), (0, 0))
 	resize_param = new_shape[:2]
 	train_generator = generator(train_log, 
@@ -131,7 +131,7 @@ def fine_tune_model(src_file_name='model.h5',
 	log = lu.readlog(log_path=log_path, img_path=img_path)
 	train_log, valid_log = train_valid_split(log)
 
-	new_shape = (66,200,3)#(65,320,3)
+	new_shape = (65,320,3)#(66,200,3)
 	crop_param = ((70, 25), (0, 0))
 	resize_param = new_shape[:2]
 	
