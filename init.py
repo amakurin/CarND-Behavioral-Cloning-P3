@@ -2,6 +2,9 @@ import model as mdl
 import argparse
 
 parser = argparse.ArgumentParser(description='Initial training')
+parser.add_argument('-model_version',
+					default = 'default',
+                    help='version of model')
 parser.add_argument('-output_model',
 					default = 'model.h5',
                     help='file name for resulting model')
@@ -21,4 +24,5 @@ args = parser.parse_args()
 mdl.train_model(model_file_name=args.output_model,
 				log_path = args.log_path, 
 				img_path = args.img_path,
-				epochs = args.epochs)
+				epochs = args.epochs,
+				version = args.model_version)
