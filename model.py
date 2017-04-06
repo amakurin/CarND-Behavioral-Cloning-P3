@@ -75,13 +75,13 @@ def create_model(input_shape= (160,320,3)):
 	model.add(Dropout(0.5))
 	
 	model.add(Flatten())
-	model.add(Dense(100))
+	model.add(Dense(512))
 	model.add(Dropout(0.5))
 	model.add(Activation('relu'))
-	model.add(Dense(50))
+	model.add(Dense(128))
 	model.add(Dropout(0.5))
 	model.add(Activation('relu'))
-	model.add(Dense(10))
+	model.add(Dense(32))
 	model.add(Dropout(0.5))
 	model.add(Activation('relu'))
 	model.add(Dense(1))
@@ -104,6 +104,7 @@ def train_model(model_file_name='model.h5',
 	resize_param = new_shape[:2]
 	train_generator = generator(train_log, 
 								keep_direct_threshold = 0.5, 
+								direct_threshold = 0.05,
 								flip_random = True,
 								resize_param=resize_param, 
 								crop_param=crop_param,
@@ -136,6 +137,7 @@ def fine_tune_model(src_file_name='model.h5',
 	
 	train_generator = generator(train_log, 
 								keep_direct_threshold = 0.5, 
+								direct_threshold = 0.05,
 								flip_random = True,
 								resize_param=resize_param, 
 								crop_param=crop_param,
