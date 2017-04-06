@@ -44,7 +44,7 @@ def generator(samples, batch_size=128,
 from keras.models import Sequential
 from keras.layers import Flatten, Dense, Lambda, Conv2D, MaxPooling2D, Dropout, Activation
 
-def my_model_v2(input_shape):
+def model_v2(input_shape):
 	model = Sequential()
 	model.add(Lambda(lambda x: x / 127.5 - 1., input_shape=input_shape))
 	model.add(Conv2D(3,1))
