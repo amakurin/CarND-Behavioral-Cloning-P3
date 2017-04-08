@@ -89,12 +89,12 @@ def get_sample(log_line, keep_direct_threshold = 0.1,
 	angle = log_line[3] 
 	index = 0
 	add = 0
-	if np.abs(angle) < direct_threshold:
-		if np.random.uniform() > keep_direct_threshold:
-			# steering additions center, left, right
-			diffs = [0, side_angle, -1.0 *side_angle]
-			index = np.random.randint(1,3)
-			add = diffs[index] + np.random.uniform(-side_rnd, side_rnd, 1)[0]
+#	if np.abs(angle) < direct_threshold:
+#		if np.random.uniform() > keep_direct_threshold:
+#			# steering additions center, left, right
+#			diffs = [0, side_angle, -1.0 *side_angle]
+#			index = np.random.randint(1,3)
+#			add = diffs[index] + np.random.uniform(-side_rnd, side_rnd, 1)[0]
 	img_path = log_line[index]
 	img = cv2.imread(img_path)
 	img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)

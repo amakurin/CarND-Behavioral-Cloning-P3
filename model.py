@@ -27,11 +27,11 @@ def generator(samples, batch_size=128,
 										direct_threshold=direct_threshold,
 										side_angle=side_angle)
 				if flip_random:
-					img, angle = lu.random_flip(img, angle)
+					#img, angle = lu.random_flip(img, angle)
 				if crop_param is not None:
 					img = lu.crop(img, crop_param)	
 				if add_distortion:
-					img, angle = lu.distort(img, angle)
+					#img, angle = lu.distort(img, angle)
 				if randomize_light:
 					img = lu.randomize_light(img)
 				if resize_param is not None:
