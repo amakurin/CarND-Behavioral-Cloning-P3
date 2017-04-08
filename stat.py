@@ -77,4 +77,7 @@ axt2std.set_ylabel("Frequency")
 plt.show()
 
 
-#lu.filter_log(t2_path, 17, './sdcdata/dt2/driving_log_thre.csv')
+#lu.filter_log(t2_path, 17, './sdcdata/dt2/driving_log_thre17.csv')
+#lu.filter_log(t2_path, 20, './sdcdata/dt2/driving_log_thre20.csv')
+#lu.filter_log(t2_path, 22, './sdcdata/dt2/driving_log_thre22.csv')
+#print("completed")
