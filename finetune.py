@@ -35,4 +35,4 @@ mdl.fine_tune_model(src_file_name=args.src_model,
 					img_path = args.img_path,
 					epochs = args.epochs,
 					version = args.model_version,
-					angle_threshold = np.radians(arg.ang_thre))
+					angle_threshold = np.radians(args.ang_thre))
