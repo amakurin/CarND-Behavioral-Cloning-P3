@@ -25,7 +25,7 @@ def resize(img, new_shape):
 	cvshape = tocv(new_shape[:2])
 	return cv2.resize(img, cvshape, interpolation=cv2.INTER_AREA)
 	
-def distort(img, angle, max_rot_degrees = 1, max_dx = 20, max_dy = 20, ang_correction = 0.075):
+def distort(img, angle, max_rot_degrees = 1, max_dx = 20, max_dy = 20, ang_correction = 0.0075):
 	'''
 	Adds distortion to input img
 	img - numpy array (height, weight, chans)
