@@ -7,10 +7,11 @@ def tocv(npshape):
 	height, width = npshape
 	return (width, height)
 
-def random_flip(img, angle, flip_prob = 0.7):
-	if np.random.uniform() < flip_prob:
-		img = cv2.flip(img, 1)
-		angle = -1.0 * angle
+def random_flip(img, angle, flip_prob = 0.52):
+	if angle < 0:
+		if np.random.uniform() < flip_prob:
+			img = cv2.flip(img, 1)
+			angle = -1.0 * angle
 	return (img, angle)
 
 def crop(img, topbottom_leftright):
@@ -64,15 +65,16 @@ def readlog(log_path = './data/driving_log.csv', img_path = './data/IMG/'):
 				line[i] = img_path + line[i].split('\\')[-1]
 			for i in range(3,7):
 				line[i] = float(line[i])
+			
 			lines.append(line)
 	return lines;
 
 def get_sample(log_line, keep_direct_threshold = 0.1, 
-			direct_threshold = 0.1, side_angle = 0.2):
+			direct_threshold = 0.0005, side_angle = 0.15):
 	index = 0
 	add = 0
 	angle = log_line[3] 
-	if angle < direct_threshold:
+	if np.abs(angle) < direct_threshold:
 		if np.random.uniform() > keep_direct_threshold:
 			# steering additions center, left, right
 			diffs = [0, side_angle, -1.0 *side_angle]
