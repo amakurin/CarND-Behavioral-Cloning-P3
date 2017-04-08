@@ -7,7 +7,7 @@ def tocv(npshape):
 	height, width = npshape
 	return (width, height)
 
-def random_flip(img, angle, flip_prob = 0.52):
+def random_flip(img, angle, flip_prob = 0.6):
 	if angle < 0:
 		if np.random.uniform() < flip_prob:
 			img = cv2.flip(img, 1)
