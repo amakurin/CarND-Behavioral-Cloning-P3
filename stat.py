@@ -13,37 +13,34 @@ def readlog(log_path,	img_path = ''):
 		lines.append(line[3])
 	return np.array(lines, dtype=np.float32)
 
-epsilon = 0.0005
+def print_stat(log, epsilon = 0.0005, max_ang = np.radians(25)):	
+	print ('Log size: {}'.format(log.shape[0]))
+	hist, bins = np.histogram(log, bins=np.linspace(-max_ang,max_ang,100))
+	print('Angles median freq: {}'.format(np.median(hist)))
+	print('Angles mean freq: {}'.format(np.mean(hist)))
+	print('Angles max freq: {}'.format(np.max(hist)))
+	negligible_freq = log[np.abs(log)<epsilon].shape[0] 
+	print ('Negligible angles freq: {}'.format(negligible_freq))
+	print('Suggested direct rate: {}'.format((np.mean(hist)+np.median(hist))/2/negligible_freq))
+	valuable_angles = log[np.abs(log)>epsilon]
+	val_freq = valuable_angles.shape[0] 
+	left_freq = valuable_angles[valuable_angles<0].shape[0]
+	right_freq = valuable_angles[valuable_angles>0].shape[0]
+	print ('Valuable LEFT angles freq: {} \ {}'.format(left_freq,left_freq/val_freq))
+	print ('Valuable RIGHT angles freq: {} \ {}'.format(right_freq,right_freq/val_freq))
+	print('Suggested flip random: {}'.format((left_freq-right_freq)/2/val_freq))
+
 t1_path = './sdcdata/dt1/driving_log.csv'
 t2_path = './sdcdata/dt2/driving_log.csv'
 	
 t1_log = readlog(t1_path)	
 print ('Track 1 ==================')
-t1_size = t1_log.shape[0]
-print ('Log size: {}'.format(t1_size))
-t1_negligible_freq = t1_log[np.abs(t1_log)<epsilon].shape[0] 
-print ('Negligible angles freq: {}'.format(t1_negligible_freq))
-t1_valuable_angles = t1_log[np.abs(t1_log)>epsilon]
-t1_val_freq = t1_valuable_angles.shape[0] 
-t1_left_freq = t1_valuable_angles[t1_valuable_angles<0].shape[0]
-t1_right_freq = t1_valuable_angles[t1_valuable_angles>0].shape[0]
-print ('Valuable LEFT angles freq: {} \ {}'.format(t1_left_freq,t1_left_freq/t1_val_freq))
-print ('Valuable RIGHT angles freq: {} \ {}'.format(t1_right_freq,t1_right_freq/t1_val_freq))
+print_stat(t1_log)
 
 t2_log = readlog(t2_path)	
 print ('Track 2 ==================')
-t2_size = t2_log.shape[0]
-print ('Log size: {}'.format(t2_size))
-t2_negligible_freq = t2_log[np.abs(t2_log)<epsilon].shape[0] 
-print ('Negligible angles freq: {}'.format(t2_negligible_freq))
-t2_valuable_angles = t2_log[np.abs(t2_log)>epsilon]
-t2_val_freq = t2_valuable_angles.shape[0] 
-t2_left_freq = t2_valuable_angles[t2_valuable_angles<0].shape[0]
-t2_right_freq = t2_valuable_angles[t2_valuable_angles>0].shape[0]
-print ('Valuable LEFT angles freq: {} \ {}'.format(t2_left_freq,t2_left_freq/t2_val_freq))
-print ('Valuable RIGHT angles freq: {} \ {}'.format(t2_right_freq,t2_right_freq/t2_val_freq))
+print_stat(t2_log)
 
-max_ang = np.radians(25)
 t1_std_ang = np.std(t1_log)
 t2_std_ang = np.std(t2_log)
 

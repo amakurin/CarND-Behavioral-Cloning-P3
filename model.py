@@ -13,15 +13,13 @@ def generator(samples, batch_size=128,
 			flip_random = False, 
 			add_distortion = False,
 			randomize_light = False,
-			resize_param = None, crop_param = None,
-			mrg_log_path = None, 
-			mrg_img_path = None,
-			mrg_rate = None):
+			resize_param = None, crop_param = None):
 	if mrg_log_path is not None:
 		mrg_samples = lu.readlog(log_path=mrg_log_path, img_path=mrg_img_path)
 		random.shuffle(mrg_samples)
 		mrg_samples = mrg_samples[0:math.floor(len(samples)*mrg_rate)]
 		samples = samples + mrg_samples
+
 	num_samples = len(samples)
 	while 1:
 		random.shuffle(samples)
@@ -135,7 +133,7 @@ def create_model(version='default', input_shape= (160,320,3)):
 def compile_model(model):
 	model.compile(loss='mse', optimizer='adam')
 	return model
-
+	
 def train_model(model_file_name='model.h5',
 				log_path = './data/driving_log.csv', 
 				img_path = './data/IMG/',

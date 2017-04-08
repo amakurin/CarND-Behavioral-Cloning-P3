@@ -7,7 +7,7 @@ def tocv(npshape):
 	height, width = npshape
 	return (width, height)
 
-def random_flip(img, angle, flip_prob = 0.6):
+def random_flip(img, angle, flip_prob = 0.012):
 	if angle < 0:
 		if np.random.uniform() < flip_prob:
 			img = cv2.flip(img, 1)
@@ -85,7 +85,7 @@ def filter_log(log_path, ang_threshold, write_to=None):
 	return thresholded
 
 def get_sample(log_line, keep_direct_threshold = 0.1, 
-				direct_threshold = 0.0005, side_angle = 0.15):
+				direct_threshold = 0.0005, side_angle = 0.15, side_rnd = 0.025):
 	angle = log_line[3] 
 	index = 0
 	add = 0
@@ -94,7 +94,7 @@ def get_sample(log_line, keep_direct_threshold = 0.1,
 			# steering additions center, left, right
 			diffs = [0, side_angle, -1.0 *side_angle]
 			index = np.random.randint(1,3)
-			add = diffs[index] 
+			add = diffs[index] + np.random.uniform(-side_rnd, side_rnd, 1)[0]
 	img_path = log_line[index]
 	img = cv2.imread(img_path)
 	img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
