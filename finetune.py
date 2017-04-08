@@ -1,5 +1,6 @@
 import model as mdl
 import argparse
+import numpy as np
 
 parser = argparse.ArgumentParser(description='Initial training')
 parser.add_argument('-model_version',
@@ -34,4 +35,4 @@ mdl.fine_tune_model(src_file_name=args.src_model,
 					img_path = args.img_path,
 					epochs = args.epochs,
 					version = args.model_version,
-					angle_threshold = arg.ang_thre)
+					angle_threshold = np.radians(arg.ang_thre))
