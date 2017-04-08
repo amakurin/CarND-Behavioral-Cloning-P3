@@ -72,11 +72,10 @@ def readlog(log_path = './data/driving_log.csv', img_path = './data/IMG/'):
 def get_sample(log_line, keep_direct_threshold = 0.1, 
 			direct_threshold = 0.0005, side_angle = 0.15, angle_threshold = 0):
 	img = None 
-	angle = None 
+	angle = log_line[3] 
 	if np.abs(angle) > angle_threshold:
 		index = 0
 		add = 0
-		angle = log_line[3] 
 		if np.abs(angle) < direct_threshold:
 			if np.random.uniform() > keep_direct_threshold:
 				# steering additions center, left, right
