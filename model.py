@@ -2,6 +2,7 @@ import random
 import numpy as np
 import sklearn
 import labutils as lu
+import math
 from sklearn.model_selection import train_test_split
 
 def train_valid_split(samples):
@@ -12,7 +13,15 @@ def generator(samples, batch_size=128,
 			flip_random = False, 
 			add_distortion = False,
 			randomize_light = False,
-			resize_param = None, crop_param = None):
+			resize_param = None, crop_param = None,
+			mrg_log_path = None, 
+			mrg_img_path = None,
+			mrg_rate = None):
+	if mrg_log_path is not None:
+		mrg_samples = lu.readlog(log_path=mrg_log_path, img_path=mrg_img_path)
+		random.shuffle(mrg_samples)
+		mrg_samples = mrg_samples[0:math.floor(len(samples)*mrg_rate)]
+		samples = samples + mrg_samples
 	num_samples = len(samples)
 	while 1:
 		random.shuffle(samples)
@@ -130,6 +139,9 @@ def compile_model(model):
 def train_model(model_file_name='model.h5',
 				log_path = './data/driving_log.csv', 
 				img_path = './data/IMG/',
+				mrg_log_path = None, 
+				mrg_img_path = None,
+				mrg_rate = None,
 				epochs = 5,
 				version = 'default'):
 	log = lu.readlog(log_path=log_path, img_path=img_path)
@@ -139,6 +151,9 @@ def train_model(model_file_name='model.h5',
 	crop_param = ((70, 25), (0, 0))
 	resize_param = new_shape[:2]
 	train_generator = generator(train_log, 
+								mrg_log_path = mrg_log_path, 
+								mrg_img_path = mrg_img_path,
+								mrg_rate = mrg_rate,
 								keep_direct_threshold = 0.1, 
 								direct_threshold = 0.0005,
 								flip_random = True,
