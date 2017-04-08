@@ -12,7 +12,7 @@ def generator(samples, batch_size=128,
 			flip_random = False, 
 			add_distortion = False,
 			randomize_light = False,
-			resize_param = None, crop_param = None):
+			resize_param = None, crop_param = None, angle_threshold = 0):
 	num_samples = len(samples)
 	while 1:
 		random.shuffle(samples)
@@ -21,10 +21,13 @@ def generator(samples, batch_size=128,
 			images = []
 			angles = []
 			for batch_sample in batch_samples:
-				img, angle = lu.get_sample(batch_sample, 
-										keep_direct_threshold=keep_direct_threshold,
-										direct_threshold=direct_threshold,
-										side_angle=side_angle)
+				img = None
+				while img is None:
+					img, angle = lu.get_sample(batch_sample, 
+											keep_direct_threshold=keep_direct_threshold,
+											direct_threshold=direct_threshold,
+											side_angle=side_angle,
+											angle_threshold = angle_threshold)
 				if flip_random:
 					img, angle = lu.random_flip(img, angle)
 				if crop_param is not None:
@@ -164,7 +167,8 @@ def fine_tune_model(src_file_name='model.h5',
 					log_path = './data/driving_log.csv', 
 					img_path = './data/IMG/',
 					epochs = 5,
-					version = 'default'):
+					version = 'default',
+					angle_threshold = 0):
 	log = lu.readlog(log_path=log_path, img_path=img_path)
 	train_log, valid_log = train_valid_split(log)
 
@@ -173,13 +177,14 @@ def fine_tune_model(src_file_name='model.h5',
 	resize_param = new_shape[:2]
 	
 	train_generator = generator(train_log, 
-								#keep_direct_threshold = 1., 
-								#direct_threshold = 0.1,
-								#flip_random = True,
+								keep_direct_threshold = 0.1, 
+								direct_threshold = 0.0005,
+								flip_random = True,
 								resize_param=resize_param, 
 								crop_param=crop_param,
 								add_distortion=True,
-								randomize_light=True)
+								randomize_light=True,
+								angle_threshold = angle_threshold)
 	valid_generator = generator(valid_log, 
 								resize_param=resize_param, 
 								crop_param=crop_param)

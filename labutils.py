@@ -25,7 +25,7 @@ def resize(img, new_shape):
 	cvshape = tocv(new_shape[:2])
 	return cv2.resize(img, cvshape, interpolation=cv2.INTER_AREA)
 	
-def distort(img, angle, max_rot_degrees = 1, max_dx = 20, max_dy = 20, ang_correction = 0.01):
+def distort(img, angle, max_rot_degrees = 1, max_dx = 20, max_dy = 20, ang_correction = 0.075):
 	'''
 	Adds distortion to input img
 	img - numpy array (height, weight, chans)
@@ -70,20 +70,23 @@ def readlog(log_path = './data/driving_log.csv', img_path = './data/IMG/'):
 	return lines;
 
 def get_sample(log_line, keep_direct_threshold = 0.1, 
-			direct_threshold = 0.0005, side_angle = 0.15):
-	index = 0
-	add = 0
-	angle = log_line[3] 
-	if np.abs(angle) < direct_threshold:
-		if np.random.uniform() > keep_direct_threshold:
-			# steering additions center, left, right
-			diffs = [0, side_angle, -1.0 *side_angle]
-			index = np.random.randint(1,3)
-			add = diffs[index] 
-	img_path = log_line[index]
-	img = cv2.imread(img_path)
-	img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-	angle = angle + add 
+			direct_threshold = 0.0005, side_angle = 0.15, angle_threshold = 0):
+	img = None 
+	angle = None 
+	if np.abs(angle) > angle_threshold:
+		index = 0
+		add = 0
+		angle = log_line[3] 
+		if np.abs(angle) < direct_threshold:
+			if np.random.uniform() > keep_direct_threshold:
+				# steering additions center, left, right
+				diffs = [0, side_angle, -1.0 *side_angle]
+				index = np.random.randint(1,3)
+				add = diffs[index] 
+		img_path = log_line[index]
+		img = cv2.imread(img_path)
+		img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+		angle = angle + add 
 	return (img, angle)
 
 #log = readlog(log_path = './data2/driving_log.csv',	img_path = './data2/IMG/')	
