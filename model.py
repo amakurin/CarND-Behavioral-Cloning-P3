@@ -14,12 +14,6 @@ def generator(samples, batch_size=128,
 			add_distortion = False,
 			randomize_light = False,
 			resize_param = None, crop_param = None):
-	if mrg_log_path is not None:
-		mrg_samples = lu.readlog(log_path=mrg_log_path, img_path=mrg_img_path)
-		random.shuffle(mrg_samples)
-		mrg_samples = mrg_samples[0:math.floor(len(samples)*mrg_rate)]
-		samples = samples + mrg_samples
-
 	num_samples = len(samples)
 	while 1:
 		random.shuffle(samples)
@@ -133,6 +127,22 @@ def create_model(version='default', input_shape= (160,320,3)):
 def compile_model(model):
 	model.compile(loss='mse', optimizer='adam')
 	return model
+
+def prepare_log(log_path, 
+				img_path,
+				mrg_log_path = None, 
+				mrg_img_path = None,
+				mrg_rate = None):
+	log = lu.readlog(log_path=log_path, img_path=img_path)
+	if mrg_log_path is not None:
+		mix_img_path = img_path
+		if mrg_img_path is not None:
+			mix_img_path =mrg_img_path
+		mix_log = lu.readlog(log_path=mrg_log_path, img_path=mix_img_path)
+		random.shuffle(mix_log)
+		mix_log = mix_log[0:math.floor(len(log)*mrg_rate)]
+		log = log + mix_log
+	return log
 	
 def train_model(model_file_name='model.h5',
 				log_path = './data/driving_log.csv', 
@@ -142,7 +152,12 @@ def train_model(model_file_name='model.h5',
 				mrg_rate = None,
 				epochs = 5,
 				version = 'default'):
-	log = lu.readlog(log_path=log_path, img_path=img_path)
+				
+	log = prepare_log(log_path,img_path,
+				mrg_log_path = mrg_log_path, 
+				mrg_img_path = mrg_img_path,
+				mrg_rate = mrg_rate)
+	
 	train_log, valid_log = train_valid_split(log)
 
 	new_shape = (65,320,3)#(66,200,3)
@@ -176,9 +191,15 @@ def fine_tune_model(src_file_name='model.h5',
 					tgt_file_name='model_tuned.h5',
 					log_path = './data/driving_log.csv', 
 					img_path = './data/IMG/',
+					mrg_log_path = None, 
+					mrg_img_path = None,
+					mrg_rate = None,
 					epochs = 5,
 					version = 'default'):
-	log = lu.readlog(log_path=log_path, img_path=img_path)
+	log = prepare_log(log_path,img_path,
+				mrg_log_path = mrg_log_path, 
+				mrg_img_path = mrg_img_path,
+				mrg_rate = mrg_rate)
 	train_log, valid_log = train_valid_split(log)
 
 	new_shape = (65,320,3)#(66,200,3)

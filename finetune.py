@@ -18,6 +18,16 @@ parser.add_argument('-log_path',
 parser.add_argument('-img_path',
 					default = './data2/IMG/',
                     help='path to images folder')
+parser.add_argument('-mrg_log_path',
+					default = None,
+                    help='path to mix datalog')
+parser.add_argument('-mrg_img_path',
+					default = None,
+                    help='path to mix images folder')
+parser.add_argument('-mrg_rate',
+					type=float,
+					default = 0.3,
+                    help='mix rate - relative to main datacet')
 parser.add_argument('-epochs',
 					type=int,
 					default = 5,
@@ -29,5 +39,8 @@ mdl.fine_tune_model(src_file_name=args.src_model,
 					tgt_file_name=args.tgt_model,
 					log_path = args.log_path, 
 					img_path = args.img_path,
+					mrg_log_path = args.mrg_log_path, 
+					mrg_img_path = args.mrg_img_path,
+					mrg_rate = args.mrg_rate,
 					epochs = args.epochs,
 					version = args.model_version)

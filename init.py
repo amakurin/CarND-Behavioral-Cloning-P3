@@ -16,14 +16,14 @@ parser.add_argument('-img_path',
                     help='path to images folder')
 parser.add_argument('-mrg_log_path',
 					default = None,
-                    help='path to datalog')
+                    help='path to mix datalog')
 parser.add_argument('-mrg_img_path',
 					default = None,
-                    help='path to images folder')
+                    help='path to mix images folder')
 parser.add_argument('-mrg_rate',
 					type=float,
 					default = 0.3,
-                    help='path to images folder')
+                    help='mix rate - relative to main datacet')
 parser.add_argument('-epochs',
 					type=int,
 					default = 5,
