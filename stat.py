@@ -14,8 +14,10 @@ def readlog(log_path,	img_path = ''):
 	return np.array(lines, dtype=np.float32)
 
 epsilon = 0.0005
+t1_path = './sdcdata/dt1/driving_log.csv'
+t2_path = './sdcdata/dt2/driving_log.csv'
 	
-t1_log = readlog('./sdcdata/dt1/driving_log.csv')	
+t1_log = readlog(t1_path)	
 print ('Track 1 ==================')
 t1_size = t1_log.shape[0]
 print ('Log size: {}'.format(t1_size))
@@ -28,7 +30,7 @@ t1_right_freq = t1_valuable_angles[t1_valuable_angles>0].shape[0]
 print ('Valuable LEFT angles freq: {} \ {}'.format(t1_left_freq,t1_left_freq/t1_val_freq))
 print ('Valuable RIGHT angles freq: {} \ {}'.format(t1_right_freq,t1_right_freq/t1_val_freq))
 
-t2_log = readlog('./sdcdata/dt2/driving_log.csv')	
+t2_log = readlog(t2_path)	
 print ('Track 2 ==================')
 t2_size = t2_log.shape[0]
 print ('Log size: {}'.format(t2_size))
@@ -73,3 +75,6 @@ axt2std.set_title("Track 2 one std")
 axt2std.set_xlabel("Steering angle")
 axt2std.set_ylabel("Frequency")
 plt.show()
+
+
+#lu.filter_log(t2_path, 17, './sdcdata/dt2/driving_log_thre.csv')

@@ -18,10 +18,6 @@ parser.add_argument('-log_path',
 parser.add_argument('-img_path',
 					default = './data2/IMG/',
                     help='path to images folder')
-parser.add_argument('-ang_thre',
-					type=int,
-					default = 0,
-                    help='Angle threshold, will use samples with abs(angle) > ang_thre')					
 parser.add_argument('-epochs',
 					type=int,
 					default = 5,
@@ -34,5 +30,4 @@ mdl.fine_tune_model(src_file_name=args.src_model,
 					log_path = args.log_path, 
 					img_path = args.img_path,
 					epochs = args.epochs,
-					version = args.model_version,
-					angle_threshold = np.radians(args.ang_thre))
+					version = args.model_version)

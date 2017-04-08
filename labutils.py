@@ -61,32 +61,46 @@ def readlog(log_path = './data/driving_log.csv', img_path = './data/IMG/'):
 	with open(log_path) as csvlog:
 		reader = csv.reader(csvlog)
 		for line in reader:
-			for i in range(0,3):
-				line[i] = img_path + line[i].split('\\')[-1]
+			if img_path is not None:
+				for i in range(0,3):
+					line[i] = img_path + line[i].split('\\')[-1]
 			for i in range(3,7):
 				line[i] = float(line[i])
 			
 			lines.append(line)
 	return lines;
 
+def log_thresholding(log, ang_threshold_degrees):
+	ang_thre = np.radians(ang_threshold_degrees)
+	for line in log:
+		if np.abs(line[3]) > ang_thre: yield line
+
+def filter_log(log_path, ang_threshold, write_to=None):
+	log = readlog(log_path=log_path, img_path=None)
+	thresholded = log_thresholding(log, ang_threshold)
+	if write_to is not None:
+		with open(write_to, 'w', newline='') as new_file:
+			writer = csv.writer(new_file, delimiter=',')
+			writer.writerows(thresholded)
+	return thresholded
+
 def get_sample(log_line, keep_direct_threshold = 0.1, 
-			direct_threshold = 0.0005, side_angle = 0.15, angle_threshold = 0):
-	img = None 
+				direct_threshold = 0.0005, side_angle = 0.15):
 	angle = log_line[3] 
-	if np.abs(angle) > angle_threshold:
-		index = 0
-		add = 0
-		if np.abs(angle) < direct_threshold:
-			if np.random.uniform() > keep_direct_threshold:
-				# steering additions center, left, right
-				diffs = [0, side_angle, -1.0 *side_angle]
-				index = np.random.randint(1,3)
-				add = diffs[index] 
-		img_path = log_line[index]
-		img = cv2.imread(img_path)
-		img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-		angle = angle + add 
+	index = 0
+	add = 0
+	if np.abs(angle) < direct_threshold:
+		if np.random.uniform() > keep_direct_threshold:
+			# steering additions center, left, right
+			diffs = [0, side_angle, -1.0 *side_angle]
+			index = np.random.randint(1,3)
+			add = diffs[index] 
+	img_path = log_line[index]
+	img = cv2.imread(img_path)
+	img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+	angle = angle + add 
 	return (img, angle)
+
 
 #log = readlog(log_path = './data2/driving_log.csv',	img_path = './data2/IMG/')	
 #img, angle = get_sample(log[np.random.randint(0,len(log))])
