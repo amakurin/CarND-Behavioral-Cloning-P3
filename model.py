@@ -172,7 +172,7 @@ def train_model(model_file_name='model.h5',
 								add_distortion=True,
 								randomize_light=True)
 	valid_generator = generator(valid_log, 
-								resize_param=resize_param, 
+								#resize_param=resize_param, 
 								crop_param=crop_param)
 
 	model = create_model(version=version, input_shape= new_shape)
@@ -209,10 +209,10 @@ def fine_tune_model(src_file_name='model.h5',
 								#flip_random = True,
 								#resize_param=resize_param, 
 								crop_param=crop_param,
-								add_distortion=True,
+								#add_distortion=True,
 								randomize_light=True)
 	valid_generator = generator(valid_log, 
-								resize_param=resize_param, 
+								#resize_param=resize_param, 
 								crop_param=crop_param)
 	model = create_model(version=version, input_shape= new_shape)
 	model.load_weights(src_file_name)
