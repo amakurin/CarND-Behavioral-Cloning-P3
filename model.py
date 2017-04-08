@@ -27,11 +27,11 @@ def generator(samples, batch_size=128,
 										direct_threshold=direct_threshold,
 										side_angle=side_angle)
 				if flip_random:
-					#img, angle = lu.random_flip(img, angle)
+					img, angle = lu.random_flip(img, angle)
 				if crop_param is not None:
 					img = lu.crop(img, crop_param)	
 				if add_distortion:
-					#img, angle = lu.distort(img, angle)
+					img, angle = lu.distort(img, angle)
 				if randomize_light:
 					img = lu.randomize_light(img)
 				if resize_param is not None:
@@ -166,10 +166,10 @@ def train_model(model_file_name='model.h5',
 	train_generator = generator(train_log, 
 								keep_direct_threshold = 0.1, 
 								direct_threshold = 0.0005,
-								flip_random = True,
-								resize_param=resize_param, 
+								#flip_random = True,
+								#resize_param=resize_param, 
 								crop_param=crop_param,
-								add_distortion=True,
+								#add_distortion=True,
 								randomize_light=True)
 	valid_generator = generator(valid_log, 
 								resize_param=resize_param, 
@@ -206,8 +206,8 @@ def fine_tune_model(src_file_name='model.h5',
 	train_generator = generator(train_log, 
 								keep_direct_threshold = 0.2, 
 								direct_threshold = 0.0005,
-								flip_random = True,
-								resize_param=resize_param, 
+								#flip_random = True,
+								#resize_param=resize_param, 
 								crop_param=crop_param,
 								add_distortion=True,
 								randomize_light=True)
