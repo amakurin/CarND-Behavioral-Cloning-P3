@@ -77,12 +77,12 @@ def log_thresholding(log, ang_threshold_degrees):
 
 def filter_log(log_path, ang_threshold, write_to=None):
 	log = readlog(log_path=log_path, img_path=None)
-	thresholded = log_thresholding(log, ang_threshold)
-	if write_to is not None:
-		with open(write_to, 'w', newline='') as new_file:
-			writer = csv.writer(new_file, delimiter=',')
-			writer.writerows(thresholded)
-	return thresholded
+	return list(log_thresholding(log, ang_threshold))
+
+def save_log(log, write_to):
+	with open(write_to, 'w', newline='') as new_file:
+		writer = csv.writer(new_file, delimiter=',')
+		writer.writerows(log)
 
 def get_sample(log_line, keep_direct_threshold = 0.1, 
 				direct_threshold = 0.0005, side_angle = 0.15, side_rnd = 0.025):
