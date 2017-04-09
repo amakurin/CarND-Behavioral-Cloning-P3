@@ -50,7 +50,6 @@ def model_v2(input_shape):
 	model.add(Lambda(lambda x: x / 127.5 - 1., input_shape=input_shape))
 	model.add(Conv2D(3,1))
 	model.add(Activation('relu'))
-	model.add(Dropout(0.5))
 	
 	model.add(Conv2D(24,5, strides=(2, 2)))
 	model.add(Activation('relu'))
