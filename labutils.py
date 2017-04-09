@@ -147,7 +147,7 @@ def save_log(log, write_to):
 		writer.writerows(log)
 
 def get_sample(log_line, keep_direct_threshold = 0.1, 
-				direct_threshold = 0.0005, side_angle = 0.15, side_rnd = 0.025):
+				direct_threshold = 0.0005, side_angle = 0.2, side_rnd = 0.025):
 	angle = log_line[3] 
 	index = 0
 	add = 0
