@@ -140,7 +140,8 @@ def prepare_log(log_path,
 			mix_img_path =mrg_img_path
 		mix_log = lu.readlog(log_path=mrg_log_path, img_path=mix_img_path)
 		random.shuffle(mix_log)
-		mix_log = mix_log[0:math.floor(len(log)*mrg_rate)]
+		slice = math.ceil(len(mix_log)/len(log)/mrg_rate)
+		mix_log = mix_log[0::slice]
 		log = log + mix_log
 	return log
 	
@@ -150,6 +151,8 @@ def train_model(model_file_name='model.h5',
 				mrg_log_path = None, 
 				mrg_img_path = None,
 				mrg_rate = None,
+				tsteps= 300,
+				vsteps= 60,
 				epochs = 5,
 				version = 'default'):
 				
@@ -178,9 +181,9 @@ def train_model(model_file_name='model.h5',
 	model = create_model(version=version, input_shape= new_shape)
 	model = compile_model(model)
 	model.fit_generator(train_generator, 
-						steps_per_epoch = 300, 
+						steps_per_epoch = tsteps, 
 						validation_data=valid_generator, 
-						validation_steps=60, epochs=epochs)
+						validation_steps=vsteps, epochs=epochs)
 
 	model.save(model_file_name)
 
@@ -191,6 +194,8 @@ def fine_tune_model(src_file_name='model.h5',
 					mrg_log_path = None, 
 					mrg_img_path = None,
 					mrg_rate = None,
+					tsteps= 300,
+					vsteps= 60,
 					epochs = 5,
 					version = 'default'):
 	log = prepare_log(log_path,img_path,
@@ -219,9 +224,9 @@ def fine_tune_model(src_file_name='model.h5',
 	model = compile_model(model)
 	
 	model.fit_generator(train_generator, 
-						steps_per_epoch = 300, 
+						steps_per_epoch = tsteps, 
 						validation_data=valid_generator, 
-						validation_steps=60, epochs=epochs)
+						validation_steps=vsteps, epochs=epochs)
 
 	model.save(tgt_file_name)
 
