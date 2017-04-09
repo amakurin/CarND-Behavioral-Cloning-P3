@@ -209,12 +209,12 @@ def fine_tune_model(src_file_name='model.h5',
 	resize_param = new_shape[:2]
 	
 	train_generator = generator(train_log, 
-								keep_direct_threshold = 0.6, 
+								keep_direct_threshold = 0.7, 
 								direct_threshold = 0.0005,
 								flip_random = True,
 								#resize_param=resize_param, 
 								crop_param=crop_param,
-								add_distortion=True,
+								#add_distortion=True,
 								randomize_light=True)
 	valid_generator = generator(valid_log, 
 								#resize_param=resize_param, 
