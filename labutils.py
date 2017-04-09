@@ -2,6 +2,7 @@ import csv
 import cv2
 import numpy as np
 import math
+import random
 
 def tocv(npshape):
 	height, width = npshape
@@ -70,14 +71,75 @@ def readlog(log_path = './data/driving_log.csv', img_path = './data/IMG/'):
 			lines.append(line)
 	return lines;
 
-def log_thresholding(log, ang_threshold_degrees):
-	ang_thre = np.radians(ang_threshold_degrees)
+def log_to_angles(log):
+	angles = [] 
 	for line in log:
-		if np.abs(line[3]) > ang_thre: yield line
+		angles.append(line[3])
+	return np.array(angles, dtype=np.float32)
 
-def filter_log(log_path, ang_threshold, write_to=None):
-	log = readlog(log_path=log_path, img_path=None)
-	return list(log_thresholding(log, ang_threshold))
+def read_angles(log_path):
+	log = readlog(log_path = log_path, img_path = None)	
+	return log_to_angles(log)
+
+def balance_log(log_path, undersampling_stds = 8):
+	print ('===========================')
+	print ('===========================')
+	print('Balancing log: {} ...'.format(log_path))
+	log = readlog(log_path = log_path, img_path = None)	
+	angles = log_to_angles(log)
+	print('Log size: {}'.format(len(angles)))
+	max_angle=np.max(angles)
+	print('max_angle: {} \ {}'.format(max_angle, np.degrees(max_angle)))
+	min_angle=np.min(angles)
+	
+	bins=np.linspace(min_angle,max_angle,400)
+	hist,bins = np.histogram(angles, bins=bins)
+	max_freq = np.max(hist)
+	print('max_freq: {}'.format(max_freq))
+	mean_freq = math.ceil(np.mean(hist[hist!=max_freq]))
+	print('mean_freq: {}'.format(mean_freq))
+	std = math.ceil(np.std(hist[hist!=max_freq]))
+	print('std: {}'.format(std))
+
+	result = []
+	for n in range(0, len(bins)-1):
+		bin_start = bins[n]
+		bin_end = bins[n+1]
+		binned = [line for line in log if (line[3]>=bin_start) and (line[3]<bin_end)]
+		binned_len = len(binned)
+		if (binned_len > (mean_freq+std*undersampling_stds)):
+			random.shuffle(binned)
+			result = result + binned[:mean_freq]
+			binned = binned[mean_freq:]
+			for i in range(0,undersampling_stds):
+				random.shuffle(binned)
+				result = result + binned[:std]
+				binned = binned[std:]
+		elif (binned_len>0) and (binned_len<mean_freq):
+			while len(binned) < mean_freq:
+				binned = binned + binned
+			result = result + binned
+		else:
+			result = result + binned
+
+	print ('...completed')
+	print ('===========================')
+	return result
+	
+def log_thresholding(log_path, low_ang_thre_deg = None, high_ang_thre_deg = None):
+	log = readlog(log_path = log_path, img_path = None)	
+	angles = log_to_angles(log)
+	if low_ang_thre_deg is None:
+		low_ang_thre = np.max(angles)
+	else:
+		low_ang_thre = np.radians(low_ang_thre_deg)
+	if high_ang_thre_deg is None:
+		high_ang_thre = np.min(angles)
+	else:
+		high_ang_thre = np.radians(high_ang_thre_deg)
+	for line in log:
+		if (np.abs(line[3]) > high_ang_thre) and (np.abs(line[3]) < low_ang_thre): 
+			yield line
 
 def save_log(log, write_to):
 	with open(write_to, 'w', newline='') as new_file:

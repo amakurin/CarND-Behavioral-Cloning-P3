@@ -1,66 +1,9 @@
-import csv
-import cv2
 import numpy as np
 import math
 import matplotlib.pyplot as plt
 import labutils as lu
 import matplotlib.gridspec as gridspec
-import random
 
-def log_to_angles(log):
-	angles = [] 
-	for line in log:
-		angles.append(line[3])
-	return np.array(angles, dtype=np.float32)
-
-def read_angles(log_path,	img_path = ''):
-	log = lu.readlog(log_path = log_path, img_path = img_path)	
-	return log_to_angles(log)
-
-def balance_log(log_path, undersampling_stds = 8):
-	print ('===========================')
-	print ('===========================')
-	print('Balancing log: {} ...'.format(log_path))
-	log = lu.readlog(log_path = log_path, img_path = None)	
-	angles = log_to_angles(log)
-	print('Log size: {}'.format(len(angles)))
-	max_angle=np.max(angles)
-	print('max_angle: {} \ {}'.format(max_angle, np.degrees(max_angle)))
-	min_angle=np.min(angles)
-	
-	bins=np.linspace(min_angle,max_angle,400)
-	hist,bins = np.histogram(angles, bins=bins)
-	max_freq = np.max(hist)
-	print('max_freq: {}'.format(max_freq))
-	mean_freq = math.ceil(np.mean(hist[hist!=max_freq]))
-	print('mean_freq: {}'.format(mean_freq))
-	std = math.ceil(np.std(hist[hist!=max_freq]))
-	print('std: {}'.format(std))
-
-	result = []
-	for n in range(0, len(bins)-1):
-		bin_start = bins[n]
-		bin_end = bins[n+1]
-		binned = [line for line in log if (line[3]>=bin_start) and (line[3]<bin_end)]
-		binned_len = len(binned)
-		if (binned_len > (mean_freq+std*undersampling_stds)):
-			random.shuffle(binned)
-			result = result + binned[:mean_freq]
-			binned = binned[mean_freq:]
-			for i in range(0,undersampling_stds):
-				random.shuffle(binned)
-				result = result + binned[:std]
-				binned = binned[std:]
-		elif (binned_len>0) and (binned_len<mean_freq):
-			while len(binned) < mean_freq:
-				binned = binned + binned
-			result = result + binned
-		else:
-			result = result + binned
-
-	print ('...completed')
-	print ('===========================')
-	return result
 	
 def print_stat(log, epsilon = 0.0005):	
 	print ('Log size: {}'.format(log.shape[0]))
@@ -101,30 +44,43 @@ def plot_hist(log, title=''):
 t1_path = './sdcdata/dt1/driving_log.csv'
 t2_path = './sdcdata/dt2/driving_log.csv'
 	
-t1_log = read_angles(t1_path)	
+t1_log = lu.read_angles(t1_path)	
 print ('Track 1 ==================')
 print_stat(t1_log)
 plot_hist(t1_log, 'Track 1')
 
-t1_balansed = balance_log(t1_path)
-angles = log_to_angles(t1_balansed)
+t1_straight = list(lu.log_thresholding(t1_path, low_ang_thre_deg = np.degrees(0.0005)))
+lu.save_log(t1_straight, './sdcdata/dt1/driving_log_s.csv')
+
+t1_tough = lu.log_thresholding(t1_path, high_ang_thre_deg = 15)
+lu.save_log(t1_tough, './sdcdata/dt1/driving_log_t.csv')
+
+t1_balansed = lu.balance_log(t1_path)
+angles = lu.log_to_angles(t1_balansed)
 print ('Track 1 balanced ==================')
 print_stat(angles)
 plot_hist(angles, 'Track 1 balanced')
-lu.save_log(t1_balansed, './sdcdata/dt1/driving_log_b.csv')
+#lu.save_log(t1_balansed, './sdcdata/dt1/driving_log_b.csv')
 
-t2_log = read_angles(t2_path)	
+t2_log = lu.read_angles(t2_path)	
 print ('Track 2 ==================')
 print_stat(t2_log)
 plot_hist(t2_log, 'Track 2')
 
-t2_balansed = balance_log(t2_path, undersampling_stds=20)
-angles = log_to_angles(t2_balansed)
+t2_straight = lu.log_thresholding(t2_path, low_ang_thre_deg = np.degrees(0.0005))
+lu.save_log(t2_straight, './sdcdata/dt2/driving_log_s.csv')
+
+t2_tough = lu.log_thresholding(t2_path, high_ang_thre_deg = 15)
+lu.save_log(t2_tough, './sdcdata/dt2/driving_log_t.csv')
+
+t2_balansed = lu.balance_log(t2_path, undersampling_stds=20)
+angles = lu.log_to_angles(t2_balansed)
 print ('Track 2 balanced ==================')
 print_stat(angles)
 plot_hist(angles, 'Track 2 balanced')
-lu.save_log(t2_balansed, './sdcdata/dt2/driving_log_b.csv')
+#lu.save_log(t2_balansed, './sdcdata/dt2/driving_log_b.csv')
 
+ 
 #lu.filter_log(t2_path, 20, './sdcdata/dt2/driving_log_thre20.csv')
 #lu.filter_log(t2_path, 22, './sdcdata/dt2/driving_log_thre22.csv')
 #print("completed")
