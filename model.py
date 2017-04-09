@@ -65,7 +65,7 @@ def model_v2(input_shape):
 	model.add(Dropout(0.5))
 	
 	model.add(Flatten())
-	model.add(Dense(512, trainable = False))
+	model.add(Dense(512))
 	model.add(Dropout(0.5))
 	model.add(Activation('relu'))
 	model.add(Dense(128))
