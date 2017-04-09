@@ -24,6 +24,14 @@ parser.add_argument('-mrg_rate',
 					type=float,
 					default = 0.3,
                     help='mix rate - relative to main datacet')
+parser.add_argument('-tsteps',
+					type=int,
+					default = 300,
+                    help='number of learning epochs'
+parser.add_argument('-vsteps',
+					type=int,
+					default = 60,
+                    help='number of learning epochs'
 parser.add_argument('-epochs',
 					type=int,
 					default = 5,
@@ -37,5 +45,7 @@ mdl.train_model(model_file_name=args.output_model,
 				mrg_log_path = args.mrg_log_path, 
 				mrg_img_path = args.mrg_img_path,
 				mrg_rate = args.mrg_rate,
+				tsteps = args.tsteps,
+				vsteps = args.vsteps,
 				epochs = args.epochs,
 				version = args.model_version)
