@@ -164,7 +164,7 @@ def train_model(model_file_name='model.h5',
 	crop_param = ((70, 25), (0, 0))
 	resize_param = new_shape[:2]
 	train_generator = generator(train_log, 
-								keep_direct_threshold = 0.5, 
+								keep_direct_threshold = 0.6, 
 								direct_threshold = 0.0005,
 								flip_random = True,
 								#resize_param=resize_param, 
@@ -204,7 +204,7 @@ def fine_tune_model(src_file_name='model.h5',
 	resize_param = new_shape[:2]
 	
 	train_generator = generator(train_log, 
-								keep_direct_threshold = 0.5, 
+								keep_direct_threshold = 0.6, 
 								direct_threshold = 0.0005,
 								flip_random = True,
 								#resize_param=resize_param, 
