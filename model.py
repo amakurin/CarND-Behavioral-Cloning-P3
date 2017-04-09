@@ -49,20 +49,22 @@ def model_v2(input_shape):
 	model = Sequential()
 	model.add(Lambda(lambda x: x / 127.5 - 1., input_shape=input_shape))
 	model.add(Conv2D(3,1))
+	model.add(Activation('relu'))
+	model.add(Dropout(0.7))
 	
 	model.add(Conv2D(24,5, strides=(2, 2)))
 	model.add(Activation('relu'))
-	model.add(Dropout(0.5))
+	model.add(Dropout(0.7))
 	
 	model.add(Conv2D(36,5, strides=(2, 2)))
 	model.add(Activation('relu'))
 	model.add(MaxPooling2D())
-	model.add(Dropout(0.5))
+	model.add(Dropout(0.7))
 	
 	model.add(Conv2D(48,3))
 	model.add(Activation('relu'))
 	model.add(MaxPooling2D())
-	model.add(Dropout(0.5))
+	model.add(Dropout(0.7))
 	
 	model.add(Flatten())
 	model.add(Dense(512))
@@ -204,12 +206,12 @@ def fine_tune_model(src_file_name='model.h5',
 	resize_param = new_shape[:2]
 	
 	train_generator = generator(train_log, 
-								keep_direct_threshold = 0.2, 
+								keep_direct_threshold = 0.7, 
 								direct_threshold = 0.0005,
-								#flip_random = True,
+								flip_random = True,
 								#resize_param=resize_param, 
 								crop_param=crop_param,
-								#add_distortion=True,
+								add_distortion=True,
 								randomize_light=True)
 	valid_generator = generator(valid_log, 
 								#resize_param=resize_param, 

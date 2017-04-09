@@ -111,21 +111,20 @@ angles = log_to_angles(t1_balansed)
 print ('Track 1 balanced ==================')
 print_stat(angles)
 plot_hist(angles, 'Track 1 balanced')
+lu.save_log(t1_balansed, './sdcdata/dt1/driving_log_b.csv')
 
 t2_log = read_angles(t2_path)	
 print ('Track 2 ==================')
 print_stat(t2_log)
-plot_hist(t1_log, 'Track 2')
+plot_hist(t2_log, 'Track 2')
 
-t2_balansed = balance_log(t2_path,undersampling_stds=20)
+t2_balansed = balance_log(t2_path, undersampling_stds=20)
 angles = log_to_angles(t2_balansed)
 print ('Track 2 balanced ==================')
 print_stat(angles)
 plot_hist(angles, 'Track 2 balanced')
-
-
-
 lu.save_log(t2_balansed, './sdcdata/dt2/driving_log_b.csv')
+
 #lu.filter_log(t2_path, 20, './sdcdata/dt2/driving_log_thre20.csv')
 #lu.filter_log(t2_path, 22, './sdcdata/dt2/driving_log_thre22.csv')
 #print("completed")
