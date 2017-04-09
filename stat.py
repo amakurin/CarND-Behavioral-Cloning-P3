@@ -47,37 +47,41 @@ t2_path = './sdcdata/dt2/driving_log.csv'
 t1_log = lu.read_angles(t1_path)	
 print ('Track 1 ==================')
 print_stat(t1_log)
-plot_hist(t1_log, 'Track 1')
+#plot_hist(t1_log, 'Track 1')
 
 t1_straight = list(lu.log_thresholding(t1_path, low_ang_thre_deg = np.degrees(0.0005)))
-lu.save_log(t1_straight, './sdcdata/dt1/driving_log_s.csv')
+#lu.save_log(t1_straight, './sdcdata/dt1/driving_log_s.csv')
 
 t1_tough = lu.log_thresholding(t1_path, high_ang_thre_deg = 15)
-lu.save_log(t1_tough, './sdcdata/dt1/driving_log_t.csv')
+#lu.save_log(t1_tough, './sdcdata/dt1/driving_log_t.csv')
 
 t1_balansed = lu.balance_log(t1_path)
 angles = lu.log_to_angles(t1_balansed)
 print ('Track 1 balanced ==================')
 print_stat(angles)
-plot_hist(angles, 'Track 1 balanced')
+#plot_hist(angles, 'Track 1 balanced')
 #lu.save_log(t1_balansed, './sdcdata/dt1/driving_log_b.csv')
 
 t2_log = lu.read_angles(t2_path)	
 print ('Track 2 ==================')
 print_stat(t2_log)
-plot_hist(t2_log, 'Track 2')
+#plot_hist(t2_log, 'Track 2')
 
 t2_straight = lu.log_thresholding(t2_path, low_ang_thre_deg = np.degrees(0.0005))
-lu.save_log(t2_straight, './sdcdata/dt2/driving_log_s.csv')
+#lu.save_log(t2_straight, './sdcdata/dt2/driving_log_s.csv')
 
 t2_tough = lu.log_thresholding(t2_path, high_ang_thre_deg = 15)
-lu.save_log(t2_tough, './sdcdata/dt2/driving_log_t.csv')
+#lu.save_log(t2_tough, './sdcdata/dt2/driving_log_t.csv')
+angles = lu.log_to_angles(t2_tough)
+print ('Track 2 tough ==================')
+print_stat(angles)
+
 
 t2_balansed = lu.balance_log(t2_path, undersampling_stds=20)
 angles = lu.log_to_angles(t2_balansed)
 print ('Track 2 balanced ==================')
 print_stat(angles)
-plot_hist(angles, 'Track 2 balanced')
+#plot_hist(angles, 'Track 2 balanced')
 #lu.save_log(t2_balansed, './sdcdata/dt2/driving_log_b.csv')
 
  
