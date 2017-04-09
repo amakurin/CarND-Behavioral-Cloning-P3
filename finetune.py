@@ -31,11 +31,11 @@ parser.add_argument('-mrg_rate',
 parser.add_argument('-tsteps',
 					type=int,
 					default = 300,
-                    help='number of learning epochs'
+                    help='number of learning epochs')
 parser.add_argument('-vsteps',
 					type=int,
 					default = 60,
-                    help='number of learning epochs'
+                    help='number of learning epochs')
 parser.add_argument('-epochs',
 					type=int,
 					default = 5,
