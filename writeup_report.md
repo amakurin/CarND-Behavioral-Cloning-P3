@@ -1,6 +1,6 @@
-#**Behavioral Cloning** 
+# **Behavioral Cloning** 
 
-##Writeup Report
+## Writeup Report
 
 ---
 
@@ -32,7 +32,7 @@ My additional goal is to build and train CNN that drives fine on both tracks sup
 ### Here I will consider the [rubric points](https://review.udacity.com/#!/rubrics/432/view) individually and describe how I addressed each point in my implementation.  
 
 ---
-###Files Submitted & Code Quality
+### Files Submitted & Code Quality
 
 #### 1. Submission includes all required files and can be used to run the simulator in autonomous mode
 
@@ -135,7 +135,7 @@ I've recorded video clips of autonomous driving on
 * [Track 2 20 mph reverse](./t2-20mph-b.mp4)
 
 
-####2. Final Model Architecture
+#### 2. Final Model Architecture
 
 The final model architecture (model.py lines 18-24) consisted of a convolution neural network with the following layers
 
@@ -180,40 +180,30 @@ Model includes 8 trainable layers:
 |dense_3 (Dense)              |128 to 16                         |
 |dense_4 (Dense)              |16 to 1                           |
 
-####3. Creation of the Training Set & Training Process
+#### 3. Creation of the Training Set & Training Process
 
 As i mentioned above, i didn't record any special driving behavior, instead i recorded 4-6 laps in both directions on both tracks.
 Actually track 2 is complex enough and normal driving log has practically all driving examples i can imagine.
 
 Samples recorded on track 1
 ![alt text][track1raw]
-
 Samples recorded on track 2
-
 ![alt text][track2raw]
-
 To augment the dataset, i adopted my 'distort' routine from traffic signs classification project. 
 This routine (labutils.py line 44) adds small random rotations, horizontal and vertical shifts to the image, and corrects angle according to horizontal shift applied.
 
 Same samples of Track 2 as above, with random distortion applied:
 ![alt text][distort]
-
 I also add random light adjustments to images (labutils.py line 66). 
-
 Same samples of Track 1 as above, with random light adjustment applied:
 ![alt text][light]
-
 I use part of samples with negligible angles as source for new samples with side cameras images and angles adjustment.
 I implemnted this by randomly selecting left or right camera image and adding correction to the steering angle (labutils.py line 175).
-
 Examples of generating new samples from sidecamera images:
 ![alt text][sidecams]
-
 I cropped images to CNN can concentrate on road boarders andcurvature (labutils.py line 25).
-
 Examples of final images:
 ![alt text][cropping]
- 
 After the collection process, I had following datasets
 
 Track 1 
@@ -225,9 +215,7 @@ Track 1
 * Negligible (< 0.0005rad) angles freq: 5621
 * Valuable left angles freq: 6618 \ 0.5158624990256451
 * Valuable right angles freq: 6211 \ 0.484137500974355
-
 ![alt text][hist1]
-
 Track 2
 ----
 * Log size: 12879
@@ -237,13 +225,10 @@ Track 2
 * Negligible (< 0.0005rad) angles freq: 4486
 * Valuable left angles freq: 4287 \ 0.510782795186465
 * Valuable right angles freq: 4106 \ 0.4892172048135351
-
 ![alt text][hist2]
- 
 As it is seen from histograms, datasets are greatly unbalanced. 
 I balanced datasets by undersampling frequent angles and oversampling rare angles. 
 This results to following datasets: 
-
 Track 1 balanced 
 ----
 * Log size: 19991
@@ -253,9 +238,7 @@ Track 1 balanced
 * Negligible angles freq: 529
 * Valuable left angles freq: 10062 \ 0.5170075017983763
 * Valuable right angles freq: 9400 \ 0.48299249820162365
-
 ![alt text][hist1b]
-
 Track 2 balanced 
 ----
 * Log size: 12859
@@ -265,9 +248,7 @@ Track 2 balanced
 * Negligible angles freq: 358
 * Valuable left angles freq: 6385 \ 0.5107591392688585
 * Valuable right angles freq: 6116 \ 0.48924086073114154
-
 ![alt text][hist2b]
-
 I trained final model on mixture of whole balanced data set of Track 2 and balanced data set of Track 1 with proportion 2:1 (model.py line 169), so the final data set contained 19289 data points.
 
 I finally randomly shuffled the data set and put 20% of the data into a validation set. 
