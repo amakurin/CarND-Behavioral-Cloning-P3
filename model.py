@@ -139,7 +139,7 @@ def prepare_log(log_path,
 		if mrg_img_path is not None:
 			mix_img_path =mrg_img_path
 		mix_log = lu.readlog(log_path=mrg_log_path, img_path=mix_img_path)
-		random.shuffle(mix_log)
+		#random.shuffle(mix_log)
 		slice = math.ceil(len(mix_log)/len(log)/mrg_rate)
 		mix_log = mix_log[0::slice]
 		log = log + mix_log
