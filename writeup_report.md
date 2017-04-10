@@ -195,13 +195,16 @@ This routine (labutils.py line 44) adds small random rotations, horizontal and v
 Same samples of Track 2 as above, with random distortion applied:
 ![alt text][distort]
 I also add random light adjustments to images (labutils.py line 66). 
+
 Same samples of Track 1 as above, with random light adjustment applied:
 ![alt text][light]
 I use part of samples with negligible angles as source for new samples with side cameras images and angles adjustment.
 I implemnted this by randomly selecting left or right camera image and adding correction to the steering angle (labutils.py line 175).
+
 Examples of generating new samples from sidecamera images:
 ![alt text][sidecams]
 I cropped images to CNN can concentrate on road boarders andcurvature (labutils.py line 25).
+
 Examples of final images:
 ![alt text][cropping]
 After the collection process, I had following datasets
@@ -253,6 +256,6 @@ I trained final model on mixture of whole balanced data set of Track 2 and balan
 
 I finally randomly shuffled the data set and put 20% of the data into a validation set. 
 
-I used generator (model.py 14) for partially lodding and adding random distortion to this data.
+I used generator (model.py 14) for partially loading and adding random distortion to this data.
 
 I used this training data for training the model. The validation set helped determine if the model was over or under fitting. The ideal number of epochs was 5 as evidenced by absence of validation loss improvement with bigger number of epochs. I used an adam optimizer so that manually training the learning rate wasn't necessary.
