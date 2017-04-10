@@ -101,7 +101,7 @@ I thought this model might be appropriate because it is designed to solve very s
 
 NVidia model was to complex to train so i decided to take only 2 convolutional layers with filter 5x5 and only one with filter 3x3. I "replaced" missing layers with max pooling with size 2x2. 
 I didn't want resize my images to not increase decision time during autonomous driving, so the input shape of the model was 65x320x3 - size of images after cropping. I increased sizes of classification layers hoping compensate decreasion in features generalization.
-I thought that grayscaling might improve generalization as well, but keeping in mind processing time limit, i decided to add one convolutional layer with filter size 1x1 and depth 3, hoping that NNC will learn to do something similar to grayscaling. 
+I thought that grayscaling might improve generalization as well, but keeping in mind processing time limit, i decided to add one convolutional layer with filter size 1x1 and depth 3, hoping that NN will learn to do something similar to grayscaling. 
 
 In order to gauge how well the model was working, I split my image and steering angle data into a training and validation set. I found that my first model had a low mean squared error on the training set but a high mean squared error on the validation set. This implied that the model was overfitting. 
 To combat the overfitting, I added dropout layers after each trainable layers except first one (conv 1x1), and last two classification layers. 
