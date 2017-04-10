@@ -6,6 +6,9 @@ import math
 from sklearn.model_selection import train_test_split
 
 def train_valid_split(samples):
+	'''
+	Splits samples to train and validation sets
+	'''
 	return train_test_split(samples, test_size=0.2)
 
 def generator(samples, batch_size=128, 
@@ -14,6 +17,20 @@ def generator(samples, batch_size=128,
 			add_distortion = False,
 			randomize_light = False,
 			resize_param = None, crop_param = None):
+	'''
+	Generates batch of samples based on supplied sample set and other parameters
+	samples - sample set
+	batch_size - size of batch to generate
+	keep_direct_threshold - probability to include sample with negligible angle to batch
+	direct_threshold - threshold for negligible angles in radians 
+	side_angle - angle in radians  
+	flip_random - when true, performs random flip of sample image\angle if it is left turn
+	add_distortion - when true, adds distortion to image\angle 
+	randomize_light - when true, adds random light adjustments to sample image 
+	crop_param - list of crop parameters ((top,bottom),(left,right)) 
+	resize_param - new shape of image (height, width) 
+	'''
+
 	num_samples = len(samples)
 	while 1:
 		random.shuffle(samples)
@@ -46,24 +63,35 @@ from keras.models import Sequential
 from keras.layers import Flatten, Dense, Lambda, Conv2D, MaxPooling2D, Dropout, Activation
 
 def model_v2(input_shape):
+	'''
+	Creates custom model
+	'''
 	model = Sequential()
+	#in: 65x320x3
 	model.add(Lambda(lambda x: x / 127.5 - 1., input_shape=input_shape))
+	#out: 65x320x3
 	model.add(Conv2D(3,1))
 	
+	#out: 31x158x24
 	model.add(Conv2D(24,5, strides=(2, 2)))
 	model.add(Activation('relu'))
 	model.add(Dropout(0.5))
 	
+	#out: 14x77x36
 	model.add(Conv2D(36,5, strides=(2, 2)))
 	model.add(Activation('relu'))
+	#out: 7x38x36
 	model.add(MaxPooling2D())
 	model.add(Dropout(0.5))
 	
+	#out: 5x36x48
 	model.add(Conv2D(48,3))
 	model.add(Activation('relu'))
+	#out: 2x18x48
 	model.add(MaxPooling2D())
 	model.add(Dropout(0.5))
 	
+	#out: 1728
 	model.add(Flatten())
 	model.add(Dense(512))
 	model.add(Dropout(0.5))
@@ -78,6 +106,9 @@ def model_v2(input_shape):
 	return model
 
 def model_nvid(input_shape):
+	'''
+	Creates nvidia model
+	'''
 	model = Sequential()
 	model.add(Lambda(lambda x: x / 127.5 - 1., input_shape=input_shape))
 	model.add(Conv2D(3,1))
@@ -118,6 +149,10 @@ def model_nvid(input_shape):
 	return model
 
 def create_model(version='default', input_shape= (160,320,3)):
+	'''
+	Creates model specified by 
+	version - version of model to create 'default', 'nvidia', 'v2' 
+	'''
 	print ('Model used: {}'.format(version))
 	model_ctors = { 'nvidia': model_nvid, 
 					'v2': model_v2,
@@ -125,6 +160,9 @@ def create_model(version='default', input_shape= (160,320,3)):
 	return model_ctors[version](input_shape)
 
 def compile_model(model):
+	'''
+	Compiles model 
+	'''
 	model.compile(loss='mse', optimizer='adam')
 	return model
 
@@ -133,6 +171,14 @@ def prepare_log(log_path,
 				mrg_log_path = None, 
 				mrg_img_path = None,
 				mrg_rate = None):
+	'''
+	Prepares log from  
+	log_path - path of main csv log file
+	and 
+	img_path - path to main IMG folder
+	and mixes additional samples from mrg_log_path and mrg_img_path if specified
+	mrg_rate - mixing rate, fraction of main log size to be taken from additional log
+	'''
 	log = lu.readlog(log_path=log_path, img_path=img_path)
 	if mrg_log_path is not None:
 		mix_img_path = img_path
@@ -155,7 +201,9 @@ def train_model(model_file_name='model.h5',
 				vsteps= 60,
 				epochs = 5,
 				version = 'default'):
-				
+	'''
+	Performes initial training
+	'''
 	log = prepare_log(log_path,img_path,
 				mrg_log_path = mrg_log_path, 
 				mrg_img_path = mrg_img_path,
@@ -198,6 +246,11 @@ def fine_tune_model(src_file_name='model.h5',
 					vsteps= 60,
 					epochs = 5,
 					version = 'default'):
+	'''
+	Performes additional training
+	src_file_name - path to existing model
+	tgt_file_name - path to save model					
+	'''
 	log = prepare_log(log_path,img_path,
 				mrg_log_path = mrg_log_path, 
 				mrg_img_path = mrg_img_path,

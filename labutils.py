@@ -5,10 +5,17 @@ import math
 import random
 
 def tocv(npshape):
+	'''
+	Flips first two dims of npshape
+	'''
 	height, width = npshape
 	return (width, height)
 
 def random_flip(img, angle, flip_prob = 0.012):
+	'''
+	Performs random flip of img if it corresponds to left turn
+	flip_prob - probability of flipping
+	'''
 	if angle < 0:
 		if np.random.uniform() < flip_prob:
 			img = cv2.flip(img, 1)
@@ -16,6 +23,10 @@ def random_flip(img, angle, flip_prob = 0.012):
 	return (img, angle)
 
 def crop(img, topbottom_leftright):
+	'''
+	Crops img 
+	topbottom_leftright - ((top,bottom),(left,right))
+	'''
 	top = topbottom_leftright[0][0]
 	bottom = img.shape[0]- topbottom_leftright[0][1]
 	left = topbottom_leftright[1][0]
@@ -23,16 +34,22 @@ def crop(img, topbottom_leftright):
 	return img[top:bottom, left:right]
 
 def resize(img, new_shape):
+	'''
+	Resizes img 
+	new_shape - (height, weight)
+	'''
 	cvshape = tocv(new_shape[:2])
 	return cv2.resize(img, cvshape, interpolation=cv2.INTER_AREA)
 	
 def distort(img, angle, max_rot_degrees = 1, max_dx = 20, max_dy = 20, ang_correction = 0.003):
 	'''
-	Adds distortion to input img
+	Adds distortion to input img and angle
 	img - numpy array (height, weight, chans)
-	maxAngle - maximum absolute angle, will be used to select random from [-maxAngle,maxAngle] uniformely
-	maxCenterDistance - maximum distance to move center of rotation
-	maxScale - maximum scale
+	angle - corresponding angle
+	max_rot_degrees - maximum angle of rotation to img, will bechosen uniformely random from (-max_rot_degrees,max_rot_degrees)
+	max_dx - maximum horizontal translation in pixels
+	ang_correction - correction of angle in radians per pixel of horizontal translation
+	max_dy - maximum vertical translation in pixels
 	'''
 	img_shape = img.shape[:2]
 	cvshape = tocv(img_shape)
@@ -58,6 +75,9 @@ def randomize_light(img, const_factor = 0.5):
 	return cv2.cvtColor(lab, cv2.COLOR_Lab2RGB)
 
 def readlog(log_path = './data/driving_log.csv', img_path = './data/IMG/'):
+	'''
+	Reads log from log_path and changes IMG path to img_path if specified
+	'''
 	lines = []
 	with open(log_path) as csvlog:
 		reader = csv.reader(csvlog)
@@ -72,16 +92,26 @@ def readlog(log_path = './data/driving_log.csv', img_path = './data/IMG/'):
 	return lines;
 
 def log_to_angles(log):
+	'''
+	Reads angles from provided log
+	'''
 	angles = [] 
 	for line in log:
 		angles.append(line[3])
 	return np.array(angles, dtype=np.float32)
 
 def read_angles(log_path):
+	'''
+	Reads angles from log at log_path
+	'''
 	log = readlog(log_path = log_path, img_path = None)	
 	return log_to_angles(log)
 
 def balance_log(log_path, undersampling_stds = 8):
+	'''
+	Performes log balancing by undersampling frequent angles and oversampling rare angles
+	undersampling_stds - threshold of angle frequencies for undersampling, count of std of angle frequency distribution
+	'''
 	print ('===========================')
 	print ('===========================')
 	print('Balancing log: {} ...'.format(log_path))
@@ -127,6 +157,9 @@ def balance_log(log_path, undersampling_stds = 8):
 	return result
 	
 def log_thresholding(log_path, low_ang_thre_deg = None, high_ang_thre_deg = None):
+	'''
+	Removes samples from log if angle is greater than low_ang_thre_deg or less than high_ang_thre_deg 
+	'''
 	log = readlog(log_path = log_path, img_path = None)	
 	angles = log_to_angles(log)
 	if low_ang_thre_deg is None:
@@ -142,12 +175,22 @@ def log_thresholding(log_path, low_ang_thre_deg = None, high_ang_thre_deg = None
 			yield line
 
 def save_log(log, write_to):
+	'''
+	Saves provided log to file specified in write_to parameter
+	'''
 	with open(write_to, 'w', newline='') as new_file:
 		writer = csv.writer(new_file, delimiter=',')
 		writer.writerows(log)
 
 def get_sample(log_line, keep_direct_threshold = 0.1, 
 				direct_threshold = 0.0005, side_angle = 0.17, side_rnd = 0.025):
+	'''
+	Converts log_line to training sample, selects center, left or right camera image
+	keep_direct_threshold - probability to use center image with negligible angle
+	direct_threshold - threshold for negligible angles in radians 
+	side_angle - absolute angle value in radians to use with left or right camera images   
+	side_rnd - max random addition to side angles 
+	'''
 	angle = log_line[3] 
 	index = 0
 	add = 0
