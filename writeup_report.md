@@ -72,7 +72,8 @@ The model includes RELU layers to introduce nonlinearity (code line 77), and the
 
 The model contains dropout layers in order to reduce overfitting (model.py lines 78). 
 
-The model was trained and validated on different data sets to ensure that the model was not overfitting (init.py 42-51).The model was tested by running it through the simulator and ensuring that the vehicle could stay on the track.
+The model was trained and validated on different data sets to ensure that the model was not overfitting (init.py 42-51). 
+The model was tested by running it through the simulator and ensuring that the vehicle could stay on the track.
 
 #### 3. Model parameter tuning
 
@@ -82,6 +83,7 @@ The model used an adam optimizer, so the learning rate was not tuned manually (m
 
 Training data was chosen to keep the vehicle driving on the road. 
 Data was collected by driving on first track 4-6 laps forward direction, 4-6 laps reverse direction and same on Track 2.
+
 I decided not to record special driving behavior but instead record driving "as is" on both tracks in both directions to experiment how well model can learn from "raw" data. 
 
 For details about how I created the training data, see the next section. 
@@ -96,7 +98,7 @@ So i started with just one output dense layer to see how far i can go with it.
 I had data from just 2 laps of Track 1, because driving track 2 were practically impossible on my laptop. 
 After few tens of trials i implemented few data augmentation utilities (more info in next sections), wich improved performance of my simplest NN ever so it could drive about quarter of lap on first track with speed 9mph.
 
-Then i've decided to try approach similar to [NVIDIA model](https://devblogs.nvidia.com/parallelforall/deep-learning-self-driving-cars/)  
+Then i decided to try approach similar to [NVIDIA model](https://devblogs.nvidia.com/parallelforall/deep-learning-self-driving-cars/)  
 I thought this model might be appropriate because it is designed to solve very similar task. 
 
 NVidia model was to complex to train so i decided to take only 2 convolutional layers with filter 5x5 and only one with filter 3x3. I "replaced" missing layers with max pooling with size 2x2. 
@@ -110,7 +112,7 @@ I trained model using Adam optimizer with batch size 128, 100 steps per epoch, 5
 
 The final step was to run the simulator to see how well the car was driving around track one. There were a few spots where the vehicle fell off the track.
 
-Luckily for me to me aws approved access to g2.2xlarge instance, and i got faster laptop.
+Luckily for me AWS approved access to g2.2xlarge instance, and i got faster laptop.
 So first i decided to record more data, and recorded 4-6 laps on first track in both directions and same on Track 2.
 
 I trained model with this data and run simulator on new laptop. The vehicle was able to drive autonomously around the track without leaving the road on 30mph.
@@ -187,26 +189,32 @@ Actually track 2 is complex enough and normal driving log has practically all dr
 
 Samples recorded on track 1
 ![alt text][track1raw]
+
 Samples recorded on track 2
 ![alt text][track2raw]
+
 To augment the dataset, i adopted my 'distort' routine from traffic signs classification project. 
 This routine (labutils.py line 44) adds small random rotations, horizontal and vertical shifts to the image, and corrects angle according to horizontal shift applied.
 
 Same samples of Track 2 as above, with random distortion applied:
 ![alt text][distort]
+
 I also add random light adjustments to images (labutils.py line 66). 
 
 Same samples of Track 1 as above, with random light adjustment applied:
 ![alt text][light]
+
 I use part of samples with negligible angles as source for new samples with side cameras images and angles adjustment.
 I implemnted this by randomly selecting left or right camera image and adding correction to the steering angle (labutils.py line 175).
 
 Examples of generating new samples from sidecamera images:
 ![alt text][sidecams]
+
 I cropped images to CNN can concentrate on road boarders andcurvature (labutils.py line 25).
 
 Examples of final images:
 ![alt text][cropping]
+
 After the collection process, I had following datasets
 
 Track 1 
@@ -219,6 +227,7 @@ Track 1
 * Valuable left angles freq: 6618 \ 0.5158624990256451
 * Valuable right angles freq: 6211 \ 0.484137500974355
 ![alt text][hist1]
+
 Track 2
 ----
 * Log size: 12879
@@ -229,6 +238,7 @@ Track 2
 * Valuable left angles freq: 4287 \ 0.510782795186465
 * Valuable right angles freq: 4106 \ 0.4892172048135351
 ![alt text][hist2]
+
 As it is seen from histograms, datasets are greatly unbalanced. 
 I balanced datasets by undersampling frequent angles and oversampling rare angles. 
 This results to following datasets: 
@@ -242,6 +252,7 @@ Track 1 balanced
 * Valuable left angles freq: 10062 \ 0.5170075017983763
 * Valuable right angles freq: 9400 \ 0.48299249820162365
 ![alt text][hist1b]
+
 Track 2 balanced 
 ----
 * Log size: 12859
@@ -252,6 +263,7 @@ Track 2 balanced
 * Valuable left angles freq: 6385 \ 0.5107591392688585
 * Valuable right angles freq: 6116 \ 0.48924086073114154
 ![alt text][hist2b]
+
 I trained final model on mixture of whole balanced data set of Track 2 and balanced data set of Track 1 with proportion 2:1 (model.py line 169), so the final data set contained 19289 data points.
 
 I finally randomly shuffled the data set and put 20% of the data into a validation set. 

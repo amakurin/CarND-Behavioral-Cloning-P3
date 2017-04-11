@@ -91,8 +91,8 @@ cols = 3
 rows = 3
 cellscnt = rows
 
-log = lu.readlog(log_path = t1_path,	img_path = './sdcdata/dt1/IMG/')	
-#log = lu.readlog(log_path = t2_path,	img_path = './sdcdata/dt2/IMG/')	
+#log = lu.readlog(log_path = t1_path,	img_path = './sdcdata/dt1/IMG/')	
+log = lu.readlog(log_path = t2_path,	img_path = './sdcdata/dt2/IMG/')	
 fig1 = plt.figure(1,figsize=(9, 4))
 cols = 3 
 rows = 2
@@ -134,10 +134,10 @@ gs = gridspec.GridSpec(rows, cols, hspace=0.0, wspace=0.1)
 ax = [plt.subplot(gs[i]) for i in range(cellscnt)]
 for i in range(cellscnt):
 	img,ang = samples[i]
-	#img,ang = lu.distort(img,ang)
-	img = lu.randomize_light(img)
+	img,ang = lu.distort(img,ang)
+	#img = lu.randomize_light(img)
 	#img = lu.crop(img, ((70, 25), (0, 0)))
-	#ax[i].set_title(str(np.degrees(ang)))
+	ax[i].set_title(str(np.degrees(ang)))
 	ax[i].imshow(img)
 	ax[i].axis('off')
 plt.show()
