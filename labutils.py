@@ -61,7 +61,7 @@ def distort(img, angle, max_rot_degrees = 1, max_dx = 20, max_dy = 20, ang_corre
 	rot_mat[0][2] += dx
 	rot_mat[1][2] += dy
 	result = cv2.warpAffine(img, rot_mat, cvshape, flags=cv2.INTER_LINEAR)
-	return (result, angle + -1.0*dx*ang_correction)	
+	return (result, angle + dx*ang_correction)	
 
 def randomize_light(img, const_factor = 0.5):
 	'''
