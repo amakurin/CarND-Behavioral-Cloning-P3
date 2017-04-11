@@ -129,7 +129,7 @@ At the end of the process, the vehicle is able to drive autonomously around both
 
 I noticed few potentially dangerous spots on track 1, and tried different approaches, with different models to generalize better with no luck, so i consider final model as "the best i can for now".
 
-I've recorded video clips of autonomous driving on
+I recorded video clips of autonomous driving on
  
 * [Track 1 30 mph forward](./video.mp4)
 * [Track 1 30 mph reverse](./t1-30mph-b.mp4)
@@ -210,7 +210,7 @@ I implemnted this by randomly selecting left or right camera image and adding co
 Examples of generating new samples from sidecamera images:
 ![alt text][sidecams]
 
-I cropped images to CNN can concentrate on road boarders andcurvature (labutils.py line 25).
+I cropped images to CNN can concentrate on road boarders and curvature (labutils.py line 25).
 
 Examples of final images:
 ![alt text][cropping]
